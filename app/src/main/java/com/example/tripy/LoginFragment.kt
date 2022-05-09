@@ -1,0 +1,130 @@
+package com.example.tripy
+
+import android.app.AlertDialog
+import android.app.Notification
+import android.content.DialogInterface
+import android.os.Bundle
+import android.text.TextUtils
+import android.util.Patterns
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation
+import androidx.navigation.Navigation.findNavController
+import com.example.tripy.databinding.FragmentLoginBinding
+import com.google.firebase.auth.FirebaseAuth
+
+
+class LoginFragment : Fragment() {
+    private lateinit var binding:FragmentLoginBinding
+    private lateinit var username: EditText
+    private lateinit var password: EditText
+    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var forgotBtn:TextView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentLoginBinding.inflate(layoutInflater)
+        username= binding.usernameLoginET
+        password= binding.passwordLoginET
+        forgotBtn = binding.forgottenpswBtn
+        firebaseAuth = FirebaseAuth.getInstance()
+
+
+        setLoginListener(binding.loginBtn)
+        setSignUpListener()
+        setForgotPswBtn()
+
+        return binding.root
+    }
+
+    private fun setLoginListener(loginBtn: Button) {
+        binding.loginBtn.setOnClickListener{loginUser()}
+
+    }
+    private fun setForgotPswBtn(){
+        forgotBtn.setOnClickListener {
+            val builder = AlertDialog.Builder(context)
+            builder.setTitle("Forgot Password")
+            val view = layoutInflater.inflate(R.layout.dialog_forgot_password,null)
+            val user: EditText = view.findViewById(R.id.et_forpsw)
+            builder.setView(view)
+            builder.setPositiveButton("Reset", DialogInterface.OnClickListener { _, _ ->
+                forgotPassword(user)
+            })
+            builder.setNegativeButton("Close", DialogInterface.OnClickListener { _, _ ->  })
+            builder.show()
+        }
+    }
+
+    private fun forgotPassword(userName:EditText) {
+        when {
+            TextUtils.isEmpty(userName.text.toString().trim()) -> {
+                return
+            }
+            (!Patterns.EMAIL_ADDRESS.matcher(userName.text.toString().trim()).matches())->{
+                //invalid email format
+                return
+            }
+        }
+        firebaseAuth.sendPasswordResetEmail(userName.text.toString())
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(context,"Email sent",Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    private fun loginUser() {
+        val icon = AppCompatResources.getDrawable(requireContext(),R.drawable.ic_baseline_warning)
+        icon?.setBounds(0,0,icon.intrinsicWidth,icon.intrinsicHeight)
+        when{
+                TextUtils.isEmpty(username.text.toString().trim())->{
+                  username.error = "Plaese Enter Your Email or Username"
+                }
+                TextUtils.isEmpty(password.text.toString().trim())->{
+                    password.error = "Plaese Enter Your Password"
+                }
+
+            username.text.toString().isNotEmpty()&&
+                    password.text.toString().isNotEmpty()->{
+                    firebaseLoginIn()                    }
+        }
+    }
+
+    private fun firebaseLoginIn() {
+        binding.loginBtn.isEnabled = false
+        binding.loginBtn.alpha = 0.5f
+        firebaseAuth.signInWithEmailAndPassword(username.text.toString(),password.text.toString()).addOnCompleteListener {
+            task->
+            if(task.isSuccessful){
+
+                findNavController(binding.root).navigate(R.id.action_loginFragment_to_mainFragment)
+
+            }else{
+                binding.loginBtn.isEnabled = true
+                binding.loginBtn.alpha = 1.0f
+                Toast.makeText(context, task.exception?.message, Toast.LENGTH_SHORT).show()
+
+            }
+
+        }
+    }
+
+
+    private fun setSignUpListener() {
+        binding.signUp.setOnClickListener { v -> findNavController(v).navigate(R.id.action_loginFragment_to_signUpFragment) }
+    }
+
+}
