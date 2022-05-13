@@ -9,16 +9,15 @@ import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.example.tripy.databinding.FragmentLoginBinding
 import com.google.firebase.auth.FirebaseAuth
+
 
 
 class LoginFragment : Fragment() {
@@ -29,6 +28,10 @@ class LoginFragment : Fragment() {
     private lateinit var forgotBtn:TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if(FirebaseAuth.getInstance().currentUser!=null){
+            findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
+        }
     }
 
     override fun onCreateView(
@@ -39,7 +42,10 @@ class LoginFragment : Fragment() {
         username= binding.usernameLoginET
         password= binding.passwordLoginET
         forgotBtn = binding.forgottenpswBtn
+//        rememberCheckBox = binding.rememberMe
         firebaseAuth = FirebaseAuth.getInstance()
+
+
 
 
         setLoginListener(binding.loginBtn)
@@ -48,6 +54,8 @@ class LoginFragment : Fragment() {
 
         return binding.root
     }
+
+
 
     private fun setLoginListener(loginBtn: Button) {
         binding.loginBtn.setOnClickListener{loginUser()}
@@ -106,10 +114,9 @@ class LoginFragment : Fragment() {
     private fun firebaseLoginIn() {
         binding.loginBtn.isEnabled = false
         binding.loginBtn.alpha = 0.5f
-        firebaseAuth.signInWithEmailAndPassword(username.text.toString(),password.text.toString()).addOnCompleteListener {
+        firebaseAuth.signInWithEmailAndPassword(username.text.toString().trim(),password.text.toString().trim()).addOnCompleteListener {
             task->
             if(task.isSuccessful){
-
                 findNavController(binding.root).navigate(R.id.action_loginFragment_to_mainFragment)
 
             }else{

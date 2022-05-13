@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.example.tripy.databinding.FragmentSignUpBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -24,7 +25,6 @@ class SignUpFragment : Fragment(){
     private lateinit var fname:EditText
     private lateinit var lname:EditText
     private lateinit var email:EditText
-    private lateinit var username:EditText
     private lateinit var password:EditText
     private lateinit var cnfPassword:EditText
     private lateinit var database:DatabaseReference
@@ -39,7 +39,6 @@ class SignUpFragment : Fragment(){
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSignUpBinding.inflate(layoutInflater)
-        username = binding.user
         fname = binding.fName
         lname = binding.lName
         email = binding.email
@@ -72,9 +71,6 @@ class SignUpFragment : Fragment(){
                 //invalid email format
                 binding.email.error = "Invalid email format"
             }
-            TextUtils.isEmpty(username.text.toString().trim())->{
-                binding.user.error = "Plaese Enter Username"
-            }
             TextUtils.isEmpty(password.text.toString().trim())->{
                 binding.password.error = "Plaese Enter Password"
             }
@@ -83,7 +79,6 @@ class SignUpFragment : Fragment(){
             }
             fname.text.toString().isNotEmpty() &&
                     lname.text.toString().isNotEmpty() &&
-                    username.text.toString().isNotEmpty() &&
                     password.text.toString().isNotEmpty() &&
                     cnfPassword.text.toString().isNotEmpty()->
             {
@@ -106,11 +101,11 @@ class SignUpFragment : Fragment(){
                 task->
             if (task.isSuccessful){
                 database = FirebaseDatabase.getInstance().getReference("Users")
-                val User = User(fname.text.toString(),lname.text.toString(),email.text.toString(),username.text.toString(),password.text.toString())
-                database.child(username.text.toString()).setValue(User).addOnSuccessListener {
+                val user = User(fname.text.toString(),lname.text.toString(),email.text.toString(),password.text.toString())
+                database.child("users").push().setValue(user).addOnSuccessListener {
                     Toast.makeText(context,"Successful saved",Toast.LENGTH_SHORT).show()
                 }
-                Navigation.findNavController(binding.root).navigate(R.id.action_signUpFragment_to_mainFragment)
+                findNavController().navigate(R.id.action_signUpFragment_to_mainFragment)
 
             }else{
                 binding.signBtn.isEnabled = true

@@ -20,7 +20,7 @@
 
     <LinearLayout
         android:layout_width="275dp"
-        android:layout_height="350dp"
+        android:layout_height="300dp"
         android:id="@+id/login_tab"
         android:background="@drawable/white_rectangle"
         android:orientation="vertical">
@@ -103,20 +103,20 @@
             android:drawablePadding="8dp"
             android:id="@+id/email"/>
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:background="@drawable/signup_textview"
-            android:layout_marginTop="10dp"
-            android:textSize="12sp"
-            android:hint="@string/user"
-            android:textColorHint="@color/grayyy"
-            android:textStyle="bold"
-            android:paddingStart="8dp"
-            android:drawablePadding="8dp"
-            android:id="@+id/user"/>
+<!--        <EditText-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="30dp"-->
+<!--            android:layout_marginLeft="20dp"-->
+<!--            android:layout_marginRight="20dp"-->
+<!--            android:background="@drawable/signup_textview"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            android:textSize="12sp"-->
+<!--            android:hint="@string/user"-->
+<!--            android:textColorHint="@color/grayyy"-->
+<!--            android:textStyle="bold"-->
+<!--            android:paddingStart="8dp"-->
+<!--            android:drawablePadding="8dp"-->
+<!--            android:id="@+id/user"/>-->
 
 
 
