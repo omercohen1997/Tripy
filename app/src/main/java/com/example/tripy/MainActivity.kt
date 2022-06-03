@@ -2,6 +2,7 @@ package com.example.tripy
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.example.tripy.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -10,5 +11,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
     }
+
 }
