@@ -32,7 +32,19 @@
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" >
         <action
+            android:id="@+id/action_mainFragment_to_help_us_improve"
+            app:destination="@id/helpFragment" />
+        <action
             android:id="@+id/action_mainFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/helpFragment"
+        android:name="com.example.tripy.HelpUsFragment"
+        android:label="fragment_help_us_improve"
+        tools:layout="@layout/fragment_help_us_improve" >
+        <action
+            android:id="@+id/action_helpFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
     </fragment>
 </navigation>
