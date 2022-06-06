@@ -53,6 +53,10 @@ class MainFragment : Fragment() {
 
                 true
             }
+            R.id.helpus -> {
+                findNavController(binding.root).navigate(R.id.action_mainFragment_to_help_us_improve)
+                return true
+            }
 
             else -> super.onOptionsItemSelected(item)
         }
