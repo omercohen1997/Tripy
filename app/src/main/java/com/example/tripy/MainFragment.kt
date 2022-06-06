@@ -21,6 +21,7 @@ class MainFragment : Fragment() {
     private lateinit var binding: FragmentMainBinding
     private lateinit var icon:ImageView
     private lateinit var menu:ImageView
+    //checking
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
