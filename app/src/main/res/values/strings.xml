@@ -23,5 +23,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="simplefeedback">אנא מלא משוב פשוט</string>
     <string name="helpustobebetter">עזרו לנו להיות טובים יותר!</string>
+    <string name="loading">בטעינה...</string>
     <string name="submit">הגש</string>
 </resources>

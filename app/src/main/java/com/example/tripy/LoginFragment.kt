@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.Notification
 import android.content.DialogInterface
 import android.os.Bundle
+import android.os.Handler
 import android.text.TextUtils
 import android.util.Patterns
 import android.view.LayoutInflater
@@ -26,6 +27,7 @@ class LoginFragment : Fragment() {
     private lateinit var password: EditText
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var forgotBtn:TextView
+    private lateinit var isdialog:AlertDialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -57,7 +59,16 @@ class LoginFragment : Fragment() {
 
 
     private fun setLoginListener(loginBtn: Button) {
-        binding.loginBtn.setOnClickListener{loginUser()}
+        binding.loginBtn.setOnClickListener{
+            val builder = AlertDialog.Builder(context)
+            val dialogView = layoutInflater.inflate(R.layout.loading_item,null)
+            builder.setView(dialogView)
+            builder.setCancelable(false)
+            isdialog = builder.create()
+            isdialog.show()
+            loginUser()
+
+        }
 
     }
     private fun setForgotPswBtn(){
@@ -108,14 +119,17 @@ class LoginFragment : Fragment() {
                     password.text.toString().isNotEmpty()->{
                     firebaseLoginIn()                    }
         }
+
     }
 
     private fun firebaseLoginIn() {
         binding.loginBtn.isEnabled = false
         binding.loginBtn.alpha = 0.5f
+
         firebaseAuth.signInWithEmailAndPassword(username.text.toString().trim(),password.text.toString().trim()).addOnCompleteListener {
             task->
             if(task.isSuccessful){
+                isdialog.dismiss()
                 findNavController(binding.root).navigate(R.id.action_loginFragment_to_mainFragment)
 
             }else{
@@ -132,5 +146,7 @@ class LoginFragment : Fragment() {
     private fun setSignUpListener() {
         binding.signUp.setOnClickListener { v -> findNavController(v).navigate(R.id.action_loginFragment_to_signUpFragment) }
     }
+
+
 
 }
