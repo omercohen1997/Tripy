@@ -12,7 +12,7 @@ import androidx.navigation.Navigation.findNavController
 import com.example.tripy.databinding.FragmentMainBinding
 import com.google.firebase.auth.FirebaseAuth
 
-
+//
 class MainFragment : Fragment() {
     private lateinit var toolbar:androidx.appcompat.widget.Toolbar
     private lateinit var drawer:DrawerLayout
