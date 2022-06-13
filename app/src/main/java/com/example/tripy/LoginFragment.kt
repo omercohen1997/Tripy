@@ -42,7 +42,6 @@ class LoginFragment : Fragment() {
         username= binding.usernameLoginET
         password= binding.passwordLoginET
         forgotBtn = binding.forgottenpswBtn
-//        rememberCheckBox = binding.rememberMe
         firebaseAuth = FirebaseAuth.getInstance()
 
 
