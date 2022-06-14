@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
@@ -28,6 +29,7 @@ class SignUpFragment : Fragment(){
     private lateinit var password:EditText
     private lateinit var cnfPassword:EditText
     private lateinit var database:DatabaseReference
+    private lateinit var arrow:ImageView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,13 +46,14 @@ class SignUpFragment : Fragment(){
         email = binding.email
         password = binding.password
         cnfPassword = binding.cnfPassword
+        arrow = binding.arrowback
         firebaseAuth = FirebaseAuth.getInstance()
 
 
 
 
         setSignUpBtnListener(binding.signBtn)
-
+        setBackArrowListener()
         return binding.root
     }
 
@@ -122,8 +125,12 @@ class SignUpFragment : Fragment(){
             registerUser()
         }
 
-//        binding.signBtn.setOnClickListener{
-//                v-> Navigation.findNavController(v).navigate(R.id.action_signUpFragment_to_mainFragment)}
+    }
+
+    private fun setBackArrowListener(){
+        arrow.setOnClickListener{
+            findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
+        }
     }
 
 

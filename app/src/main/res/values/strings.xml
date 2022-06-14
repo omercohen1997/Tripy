@@ -14,15 +14,14 @@
     <string name="confirm_password">Confirm password</string>
     <string name="email">Email</string>
     <string name="user">Username</string>
-    <string name="logout">התנתק</string>
-    <string name="help">הצע לנו להשתפר</string>
-    <string name="history">היסטוריית אתרים</string>
-    <string name="roots">המסלולים שלי</string>
-    <string name="build_track">בנה מסלול</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="simplefeedback">אנא מלא משוב פשוט</string>
-    <string name="helpustobebetter">עזרו לנו להיות טובים יותר!</string>
-    <string name="loading">בטעינה...</string>
-    <string name="submit">הגש</string>
+    <string name="logout">Logout</string>
+    <string name="help">Help us improve</string>
+    <string name="history">Sites history</string>
+
+    <string name="build_track">Build route</string>
+
+    <string name="simplefeedback">Please fill in simple feedback</string>
+    <string name="helpustobebetter">Help us improve!</string>
+    <string name="loading">Loading..</string>
+    <string name="submit">Submit</string>
 </resources>

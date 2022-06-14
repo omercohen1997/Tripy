@@ -3,7 +3,7 @@
     <style name="Theme.Tripy" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <item name="android:actionOverflowButtonStyle">@style/MyActionButtonOverflow</item>
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/bb</item>
+        <item name="colorPrimary">@color/kkkk</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
@@ -15,6 +15,7 @@
         <!-- Customize your theme here. -->
 
     </style>
+
     <style name="MyActionButtonOverflow" parent="android:style/Widget.Holo.Light.ActionButton.Overflow">
         <item name="android:src">@drawable/menu</item>
         <item name="android:background">?android:attr/actionBarItemBackground</item>
