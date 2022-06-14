@@ -6,6 +6,8 @@
     <string name="login">התחבר</string>
     <string name="login_btn">התחברות</string>
     <string name="remember">זכור אותי</string>
+    <string name="sign">הרשמה</string>
+    <string name="tosign">הרשם</string>
     <string name="forgotten_password">שכחתי סיסמה</string>
     <string name="q">אין לך עדיין חשבון?</string>
     <string name="sign_up">לחץ להרשמה</string>

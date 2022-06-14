@@ -8,6 +8,8 @@
     <string name="forgotten_password">Forgotten password?</string>
     <string name="q">Dont you have an account?</string>
     <string name="sign_up">Sign up</string>
+    <string name="sign">Sign up</string>
+    <string name="tosign">SIGN UP</string>
     <string name="fill_in">Please fill in this form to create an account!</string>
     <string name="first_name">First name</string>
     <string name="last_name">Last name</string>

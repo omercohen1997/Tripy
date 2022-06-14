@@ -1,5 +1,6 @@
 package com.example.tripy
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.os.PatternMatcher
 import android.text.TextUtils
@@ -30,6 +31,7 @@ class SignUpFragment : Fragment(){
     private lateinit var cnfPassword:EditText
     private lateinit var database:DatabaseReference
     private lateinit var arrow:ImageView
+    private lateinit var isdialog:AlertDialog
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,6 +110,7 @@ class SignUpFragment : Fragment(){
                 database.child("users").push().setValue(user).addOnSuccessListener {
                     Toast.makeText(context,"Successful saved",Toast.LENGTH_SHORT).show()
                 }
+                isdialog.dismiss()
                 findNavController().navigate(R.id.action_signUpFragment_to_mainFragment)
 
             }else{
@@ -122,6 +125,12 @@ class SignUpFragment : Fragment(){
 
     private fun setSignUpBtnListener(signUpBtn: Button) {
         signUpBtn.setOnClickListener {
+            val builder = AlertDialog.Builder(context)
+            val dialogView = layoutInflater.inflate(R.layout.loading_item,null)
+            builder.setView(dialogView)
+            builder.setCancelable(false)
+            isdialog = builder.create()
+            isdialog.show()
             registerUser()
         }
 
