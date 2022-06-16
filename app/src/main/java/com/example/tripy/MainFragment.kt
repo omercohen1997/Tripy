@@ -1,14 +1,16 @@
 package com.example.tripy
 
 import android.Manifest
+import android.R.attr.password
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.IntentSender.SendIntentException
-import android.content.IntentSender.writeIntentSenderOrNullToParcel
 import android.content.pm.PackageManager
 import android.location.Location
-import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
@@ -197,11 +199,14 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         Log.d(TAG, "onMapReady: map is ready")
         mMap = googleMap
         mMap.uiSettings.isZoomControlsEnabled = true
+        mMap.uiSettings.isMapToolbarEnabled = false
         getDeviceCurrentLocation()
         readDataFromFirebase(mMap)
         mMap.setOnInfoWindowClickListener(this)
 
     }
+
+
 
     private fun getDeviceCurrentLocation() {
         Log.d(TAG, "getDeviceLocation: getting the devices current location")
@@ -235,6 +240,21 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoom))
     }
 
+
+
+    fun isRTL(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            (context.getResources().getConfiguration().getLayoutDirection()
+                    === View.LAYOUT_DIRECTION_RTL)
+            // Another way:
+            // Define a boolean resource as "true" in res/values-ldrtl
+            // and "false" in res/values
+            // return context.getResources().getBoolean(R.bool.is_right_to_left);
+        } else {
+            false
+        }
+    }
+
     // read the data and add a marker on the map
     private fun readDataFromFirebase(googleMap: GoogleMap) {
         Log.w(TAG_DB, "In readDataFromFirebase")
@@ -248,7 +268,9 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
 
                     val hebrewName = dataSnap.child("Hebrew Name").value.toString()
 
-                    val englishName = dataSnap.child("Name").value.toString()
+                    val englishAttName = dataSnap.child("Name").value.toString()
+
+                    val englishCategoryName = dataSnap.child("English Category").value.toString()
 
                     val latitude = dataSnap.child("latitude").value.toString().toDouble()
 
@@ -260,14 +282,24 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                     val distance = getDistance(currentLatLong.latitude,currentLatLong.longitude,latitude,longitude)
                     //Log.d(TAG_DB, "getDeviceLocation: lat = ${currentLatLong.latitude}, ${currentLatLong.longitude}")
 
-                    val snippet = " שם אטרקציה:  $hebrewName\n קטגוריה:  $category\n  מרחק ליעד:  $distance\n"
+                   // val snippet = " שם אטרקציה:  $hebrewName\n קטגוריה:  $category\n  מרחק ליעד:  $distance\n"
 
                     // googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(requireContext()))
 
-                    googleMap.addMarker(MarkerOptions().position(LatLng(latitude,longitude))
-                            .title(hebrewName)
-                            .snippet(snippet)
-                    )
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!))
+                    {
+                        val snippet = " שם אטרקציה:  $hebrewName\n קטגוריה:  $category\n מרחק ליעד:  $distance\n"
+                        googleMap.addMarker(MarkerOptions().position(LatLng(latitude,longitude))
+                                .title(hebrewName)
+                                .snippet(snippet))
+                    }
+                    else
+                    {
+                        val snippet = "Attraction Name: $englishAttName\nCategory: $englishCategoryName\ndistance: $distance\n"
+                        googleMap.addMarker(MarkerOptions().position(LatLng(latitude,longitude))
+                                .title(englishAttName)
+                                .snippet(snippet))
+                    }
                 }
             }
 
@@ -277,6 +309,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
             }
         })
     }
+
 
     override fun onInfoWindowClick(p0: Marker) {
         Log.w(TAG_DB, "onInfoWindowClick: In function, description = ${p0.title})" )
@@ -297,20 +330,27 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         val distanceInKm : Float
         Location.distanceBetween(startLat, startLon, endLat, endLon, results)
 
-        return if(results[0]>1000)
+        if(results[0]>1000)
         {
             distanceInKm = results[0] / 1000
             roundOff = ((distanceInKm * 100.0).roundToInt() / 100.0).toFloat()
-            "$roundOff קילומטר "
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!))
+                "$roundOff קילומטר "
+            else
+                "$roundOff kilometer"
         }
         else
         {
             distanceInKm = results[0] / 1000
             roundOff = ((distanceInKm * 100.0).roundToInt() / 100.0).toFloat()
-            "$roundOff מטרים "
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!))
+                "$roundOff מטרים "
+            else
+                "$roundOff meter"
         }
 
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.drawer_menu, menu)
