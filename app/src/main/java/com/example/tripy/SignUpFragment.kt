@@ -114,6 +114,7 @@ class SignUpFragment : Fragment(){
                 findNavController().navigate(R.id.action_signUpFragment_to_mainFragment)
 
             }else{
+                isdialog.dismiss()
                 binding.signBtn.isEnabled = true
                 binding.signBtn.alpha = 1.0f
                 Toast.makeText(context, task.exception?.message,Toast.LENGTH_SHORT).show()

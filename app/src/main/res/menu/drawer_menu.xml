@@ -6,14 +6,19 @@
         <item android:id="@+id/build"
             android:title="@string/build_track">
         </item>
-<!--         <item android:id="@+id/root"-->
-<!--            android:title="@string/roots">-->
-<!--        </item>-->
+         <item android:id="@+id/filter"
+            android:title="@string/filter">
+        </item>
         <item android:id="@+id/history"
             android:title="@string/history">
         </item>
         <item android:id="@+id/helpus"
             android:title="@string/help">
+
+        </item>
+
+        <item android:id="@+id/update"
+            android:title="@string/updates">
         </item>
         <item android:id="@+id/logout"
             android:title="@string/logout">
