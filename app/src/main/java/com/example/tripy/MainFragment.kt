@@ -38,9 +38,6 @@ import kotlin.math.roundToInt
 
 
 class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickListener{
-    private lateinit var toolbar: androidx.appcompat.widget.Toolbar
-    private lateinit var drawer: DrawerLayout
-    private lateinit var actionBar: ActionBar
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var binding: FragmentMainBinding
     private lateinit var locationRequest: LocationRequest
@@ -60,8 +57,6 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     // firebase realtime database variable
     private lateinit var database : DatabaseReference
 
-    private lateinit var icon:ImageView
-    private lateinit var menu:ImageView
     //checking
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -380,6 +375,14 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
             }
             R.id.helpus -> {
                 findNavController(binding.root).navigate(R.id.action_mainFragment_to_help_us_improve)
+                return true
+            }
+            R.id.update -> {
+                findNavController(binding.root).navigate(R.id.action_mainFragment_to_fragment_keep_us_posted)
+                return true
+            }
+            R.id.filter -> {
+                findNavController(binding.root).navigate(R.id.action_mainFragment_to_filtterAttraction)
                 return true
             }
 

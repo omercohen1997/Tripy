@@ -134,6 +134,7 @@ class LoginFragment : Fragment() {
                 findNavController(binding.root).navigate(R.id.action_loginFragment_to_mainFragment)
 
             }else{
+                isdialog.dismiss()
                 binding.loginBtn.isEnabled = true
                 binding.loginBtn.alpha = 1.0f
                 Toast.makeText(context, task.exception?.message, Toast.LENGTH_SHORT).show()

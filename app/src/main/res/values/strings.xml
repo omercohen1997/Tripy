@@ -19,11 +19,40 @@
     <string name="logout">Logout</string>
     <string name="help">Help us improve</string>
     <string name="history">Sites history</string>
-
+    <string name="updates">Keep us posted</string>
+    <string name="keep_us">Give us the updates</string>
     <string name="build_track">Build route</string>
-
+    <string name="update">Update</string>
+    <string name="category">Choose category</string>
+    <string name="filter">Filter</string>
+    <string name="choose">Choose which places you want to see</string>
     <string name="simplefeedback">Please fill in simple feedback</string>
     <string name="helpustobebetter">Help us improve!</string>
+    <string name="historical_sites">Historical sites</string>
+    <string name="shows">Shows and exhibitions</string>
+    <string name="nature">Nature reserve</string>
+    <string name="agri">Agricultural tourism</string>
+    <string name="observ">Observation points</string>
+    <string name="stores">Stores</string>
+    <string name="national">National parks</string>
+    <string name="cities">Cities</string>
+    <string name="beaches">Beaches</string>
+    <string name="ports">Ports</string>
+    <string name="meu">Museums</string>
+    <string name="parks">Parks</string>
+    <string name="zoo">Zoo</string>
+    <string name="all">Mark all</string>
+    <string name="clear">Clear all</string>
+    <string name="telaviv">Tel-Aviv walks</string>
+    <string name="safed">Safed walks</string>
+    <string name="water">Water attraction</string>
     <string name="loading">Loading..</string>
     <string name="submit">Submit</string>
+    <string name="enterfilter">Enter</string>
+    <string name="enterthename">Enter the attraction name:</string>
+    <string name="chooseattr">Choose kind of attraction</string>
+    <string name="fillin">Fill here the updates</string>
+    <string name="please">Please select an kind of attraction</string>
+
+
 </resources>

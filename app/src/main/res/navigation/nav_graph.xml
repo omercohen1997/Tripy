@@ -40,6 +40,15 @@
         <action
             android:id="@+id/action_mainFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_fragment_keep_us_posted"
+            app:destination="@id/fragment_keep_us_posted" />
+        <action
+            android:id="@+id/action_mainFragment_to_filtterAttraction"
+            app:destination="@id/filtterAttraction" />
+        <action
+            android:id="@+id/action_mainFragment_to_fragment_keep_us_posted2"
+            app:destination="@id/fragment_keep_us_posted" />
     </fragment>
     <fragment
         android:id="@+id/helpFragment"
@@ -48,6 +57,24 @@
         tools:layout="@layout/fragment_help_us_improve" >
         <action
             android:id="@+id/action_helpFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_keep_us_posted"
+        android:name="com.example.tripy.KeepUsPostedFragment"
+        android:label="fragment_keep_us_posted"
+        tools:layout="@layout/fragment_keep_us_posted" >
+        <action
+            android:id="@+id/action_fragment_keep_us_posted_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/filtterAttraction"
+        android:name="com.example.tripy.FiltterAttraction"
+        android:label="fragment_filtter_attraction"
+        tools:layout="@layout/fragment_filtter_attraction" >
+        <action
+            android:id="@+id/action_filtterAttraction_to_mainFragment"
             app:destination="@id/mainFragment" />
     </fragment>
 </navigation>
