@@ -378,7 +378,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                 return true
             }
             R.id.update -> {
-                findNavController(binding.root).navigate(R.id.action_mainFragment_to_help_us_improve)
+                findNavController(binding.root).navigate(R.id.action_mainFragment_to_fragment_keep_us_posted)
                 return true
             }
             R.id.filter -> {

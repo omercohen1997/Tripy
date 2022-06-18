@@ -46,6 +46,9 @@
         <action
             android:id="@+id/action_mainFragment_to_filtterAttraction"
             app:destination="@id/filtterAttraction" />
+        <action
+            android:id="@+id/action_mainFragment_to_fragment_keep_us_posted2"
+            app:destination="@id/fragment_keep_us_posted" />
     </fragment>
     <fragment
         android:id="@+id/helpFragment"
