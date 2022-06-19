@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.example.tripy.databinding.FragmentFiltterAttractionBinding
 
@@ -33,11 +34,20 @@ class FiltterAttraction : Fragment() {
         enter = binding.filterRes
         markAll = binding.btnCheckAll
         clearAll = binding.btnClearAll
+        back = binding.arrowback
+        setBackListener(back)
         setMarkAllListener(markAll)
         setClearAllListener(clearAll)
         setEnterListener(enter)
         // Inflate the layout for this fragment
         return binding.root
+    }
+
+    private fun setBackListener(back:ImageView){
+        back.setOnClickListener {
+            findNavController().navigate(R.id.action_filtterAttraction_to_mainFragment)
+        }
+
     }
 
     //the logic to clear all
