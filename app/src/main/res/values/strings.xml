@@ -52,7 +52,22 @@
     <string name="enterthename">Enter the attraction name:</string>
     <string name="chooseattr">Choose kind of attraction</string>
     <string name="fillin">Fill here the updates</string>
-    <string name="please">Please select an kind of attraction</string>
-
+    <string name="please">Please select a kind of attraction</string>
+    <string name="select">Select category</string>
+    <string name="warning1">Please Enter Your Email</string>
+    <string name="warning2">Please Enter Your Password</string>
+    <string name="warning3">Please Enter Your First Name</string>
+    <string name="warning4">Please Enter Your Last Name</string>
+    <string name="warning5">Invalid email format</string>
+    <string name="warning6">Please Enter Password Again</string>
+    <string name="warning7">Password Did Not Match</string>
+    <string name="sent">Email sent</string>
+    <string name="reset">Reset</string>
+    <string name="close">Close</string>
+    <string name="forget">Forget password</string>
+    <string name="success">Successful saved</string>
+    <string name="please2">Please insert the attraction name</string>
+    <string name="thank1">We saved your feedback, Thank you for your time!</string>
+    <string name="thank2">We saved your updates, Thank you for your time!</string>
 
 </resources>

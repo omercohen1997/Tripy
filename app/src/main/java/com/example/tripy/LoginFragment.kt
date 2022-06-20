@@ -75,14 +75,14 @@ class LoginFragment : Fragment() {
     private fun setForgotPswBtn(){
         forgotBtn.setOnClickListener {
             val builder = AlertDialog.Builder(context)
-            builder.setTitle("Forgot Password")
+            builder.setTitle(R.string.forget.toString())
             val view = layoutInflater.inflate(R.layout.dialog_forgot_password,null)
             val user: EditText = view.findViewById(R.id.et_forpsw)
             builder.setView(view)
-            builder.setPositiveButton("Reset", DialogInterface.OnClickListener { _, _ ->
+            builder.setPositiveButton(R.string.reset.toString(), DialogInterface.OnClickListener { _, _ ->
                 forgotPassword(user)
             })
-            builder.setNegativeButton("Close", DialogInterface.OnClickListener { _, _ ->  })
+            builder.setNegativeButton(R.string.close.toString(), DialogInterface.OnClickListener { _, _ ->  })
             builder.show()
         }
     }
@@ -100,7 +100,7 @@ class LoginFragment : Fragment() {
         firebaseAuth.sendPasswordResetEmail(userName.text.toString())
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Toast.makeText(context,"Email sent",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,R.string.sent.toString(),Toast.LENGTH_SHORT).show()
                 }
             }
     }
@@ -110,10 +110,10 @@ class LoginFragment : Fragment() {
         icon?.setBounds(0,0,icon.intrinsicWidth,icon.intrinsicHeight)
         when{
                 TextUtils.isEmpty(username.text.toString().trim())->{
-                  username.error = "Plaese Enter Your Email or Username"
+                  username.error = R.string.warning1.toString()
                 }
                 TextUtils.isEmpty(password.text.toString().trim())->{
-                    password.error = "Plaese Enter Your Password"
+                    password.error = R.string.warning2.toString()
                 }
 
             username.text.toString().isNotEmpty()&&

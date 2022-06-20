@@ -54,4 +54,20 @@
     <string name="fillin">הכנס כאן את העדכונים</string>
     <string name="please">אנא בחר סוג אטרקציה</string>
     <string name="submit">הגש</string>
+    <string name="select">בחר קטגוריה</string>
+    <string name="warning1">אנא הכנס מייל</string>
+    <string name="warning2">אנא הכנס סיסמה</string>
+    <string name="warning3">אנא הכנס שם פרטי</string>
+    <string name="warning4">אנא הכנס שם משפחה</string>
+    <string name="warning5">פורמט מייל לא תקין</string>
+    <string name="warning6">אנא הכנס שוב סיסמה</string>
+    <string name="warning7">סיסמאות לא תואמות</string>
+    <string name="sent">המייל נשלח</string>
+    <string name="reset">שחזר</string>
+    <string name="close">סגור</string>
+    <string name="forget">שכחתי סיסמה</string>
+    <string name="success">נשמר בהצלחה</string>
+    <string name="please2">נא הכנס שם של אטרקציה</string>
+    <string name="thank1">שמרנו את הפידבק שלך, תודה על הקדשת הזמן!</string>
+    <string name="thank2">שמרנו את העידכונים שלך, תודה על הקדשת הזמן!</string>
 </resources>
