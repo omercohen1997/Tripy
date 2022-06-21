@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
+import com.example.tripy.MySingleton.rememberLastCurrentLatLong
 import com.example.tripy.databinding.FragmentMainBinding
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -35,14 +36,25 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlin.math.roundToInt
+import kotlin.properties.Delegates
 
+
+object MySingleton {
+    lateinit var rememberLastCurrentLatLong: LatLng
+}
 
 class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickListener{
+    companion object{
+        var flag = 0
+    }
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var binding: FragmentMainBinding
     private lateinit var locationRequest: LocationRequest
     private lateinit var currentLatLong : LatLng
     private lateinit var  description : String
+    private var fragmentFilterArrayList = ArrayList<String>()   // saving in array list the categories the use chose in FilterAttraction fragment
+
+
     private val LOCATION_PERMISSION_REQUEST_CODE = 1234
     private val TAG = "MapActivity"
     private val TAG_DB = "Database"
@@ -51,24 +63,41 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     private lateinit var mMap:GoogleMap
 
     // current location vars
-    private lateinit var lastLocation : Location
+    private lateinit var lastLocation1 : Location
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     // firebase realtime database variable
     private lateinit var database : DatabaseReference
 
-    //checking
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
         super.onCreate(savedInstanceState)
+        /*
+        if(isGooglePlayServicesAvailable()) {
+            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+            requestLocationPermission()
+        }
+
+         */
+    }
+
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentMainBinding.inflate(layoutInflater)
+
+        firebaseAuth = FirebaseAuth.getInstance()
 
         if(isGooglePlayServicesAvailable()) {
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
             requestLocationPermission()
         }
-    }
 
+
+        return binding.root
+    }
 
     // checking if google services install on the device
     private fun isGooglePlayServicesAvailable(): Boolean {
@@ -196,11 +225,21 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.uiSettings.isMapToolbarEnabled = false
         getDeviceCurrentLocation()
-        readDataFromFirebase(mMap)
+
+        // 1 = אומר שהמשתמש נכנס לעמוד של הפילטרים , אם הוא לא בחר כלום אז הפונצנקציה שמראה את כל האטרקציות נקראת , אחרת הוא מפלטר לפי הפונקציה השנייה עם המערך של הקטגוריות שהוא בחר שחוזר מהפרגמנט
+        if(flag == 1) {
+            fragmentFilterArrayList = retrieveCategoryFilter()
+            if(fragmentFilterArrayList.isNotEmpty())
+                readDataFromFirebaseByCategory(mMap,fragmentFilterArrayList)
+            else
+                readDataFromFirebase(mMap)
+        }
+        else
+            readDataFromFirebase(mMap)
+
         mMap.setOnInfoWindowClickListener(this)
 
     }
-
 
 
     private fun getDeviceCurrentLocation() {
@@ -215,12 +254,17 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
             return
         }
         mMap.isMyLocationEnabled = true
+      //  Log.d(TAG, "getDeviceLocation: $myVariable")
+       // rememberLastLocation = fusedLocationProviderClient.getLastLocation()
         fusedLocationProviderClient.lastLocation.addOnSuccessListener(requireActivity()) { location ->
             if(location != null)
             {
-                lastLocation = location
+                Log.d(TAG, "getDeviceLocation: In if(location != null)")
+                lastLocation1 = location
+               // rememberLastLocation = lastLocation
                 currentLatLong = LatLng(location.latitude,location.longitude)
-                moveCamera(currentLatLong,13f)
+                rememberLastCurrentLatLong = currentLatLong
+                moveCamera(currentLatLong,11f)
                 // lat = location.latitude
             }
             else
@@ -236,10 +280,9 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     }
 
 
-
     fun isRTL(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            (context.getResources().getConfiguration().getLayoutDirection()
+            (context.resources.configuration.layoutDirection
                     === View.LAYOUT_DIRECTION_RTL)
             // Another way:
             // Define a boolean resource as "true" in res/values-ldrtl
@@ -251,7 +294,81 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     }
 
     // read the data and add a marker on the map
-    private fun readDataFromFirebase(googleMap: GoogleMap) {
+    private fun readDataFromFirebaseByCategory(googleMap: GoogleMap,categoryFilterArrayList : ArrayList<String>) {
+        Log.w(TAG_DB, "In readDataFromFirebaseByCategory")
+        lateinit var  distance : String
+       // val categoryFilterArrayList: ArrayList<String> = retrieveCategoryFilter()
+        googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(requireContext()))
+
+        database = FirebaseDatabase.getInstance().getReference("Attractions")
+        database.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (dataSnap in dataSnapshot.children) {
+                    val hebrewCategory = dataSnap.child("Category").value.toString()
+                    val englishCategoryName = dataSnap.child("English Category").value.toString()
+
+                    for (categoryFilter in categoryFilterArrayList)
+                        if (categoryFilter == englishCategoryName || categoryFilter == hebrewCategory) {
+
+                            val hebrewName = dataSnap.child("Hebrew Name").value.toString()
+
+                            val englishAttName = dataSnap.child("Name").value.toString()
+
+                            val latitude = dataSnap.child("latitude").value.toString().toDouble()
+
+                            val longitude = dataSnap.child("Longitude").value.toString().toDouble()
+                            //latLngCoordinates.add(LatLng(latitude,longitude))
+
+                            //description = dataSnap.child("description").value.toString()
+
+                            if (::currentLatLong.isInitialized) {
+                                //Log.d(TAG_DB, "getDeviceLocation: if = True --> lat = ${currentLatLong.latitude}, ${currentLatLong.longitude}")
+                                distance = getDistance(currentLatLong.latitude, currentLatLong.longitude, latitude, longitude)
+                            } else {
+                                //Log.d(TAG_DB, "getDeviceLocation: if = false --> lat = ${rememberLastCurrentLatLong.latitude}, ${rememberLastCurrentLatLong.longitude}")
+                                currentLatLong = rememberLastCurrentLatLong
+                                distance = getDistance(currentLatLong.latitude, currentLatLong.longitude, latitude, longitude)
+                            }
+
+
+                            // googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(requireContext()))
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!)) {
+                                val snippet = " שם אטרקציה:  $hebrewName\n קטגוריה:  $hebrewCategory\n מרחק ליעד:  $distance\n"
+                                googleMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude))
+                                        .title(hebrewName)
+                                        .snippet(snippet))
+                            } else {
+                                val snippet = "Attraction Name: $englishAttName\nCategory: $englishCategoryName\ndistance: $distance\n"
+                                googleMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude))
+                                        .title(englishAttName)
+                                        .snippet(snippet))
+                            }
+                        }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG_DB, "loadPost:onCancelled", databaseError.toException())
+            }
+        })
+    }
+
+    // retrieve the specific categories the user chose from the fragment FilterAttraction
+    private fun retrieveCategoryFilter() : ArrayList<String> {
+        var retrieveCategoryArrayList = ArrayList<String>()
+        if (flag == 1) { // in case the user did not pick any category filter (all checkboxes are empty)
+            retrieveCategoryArrayList = requireArguments().getStringArrayList("categoryFilerKey") as ArrayList<String>
+            return retrieveCategoryArrayList
+        }
+        return retrieveCategoryArrayList
+        }
+
+
+    private fun readDataFromFirebase(googleMap: GoogleMap)
+    {
+        lateinit var  distance : String
         Log.w(TAG_DB, "In readDataFromFirebase")
         googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(requireContext()))
 
@@ -260,41 +377,44 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (dataSnap in dataSnapshot.children) {
                     val category = dataSnap.child("Category").value.toString()
-
-                    val hebrewName = dataSnap.child("Hebrew Name").value.toString()
-
-                    val englishAttName = dataSnap.child("Name").value.toString()
-
                     val englishCategoryName = dataSnap.child("English Category").value.toString()
 
-                    val latitude = dataSnap.child("latitude").value.toString().toDouble()
+               //     if (selectedCategory == englishCategoryName) {
+                  //      count++
+                       // Log.w(TAG_DB, "$count")
 
-                    val longitude = dataSnap.child("Longitude").value.toString().toDouble()
-                    //latLngCoordinates.add(LatLng(latitude,longitude))
+                        val hebrewName = dataSnap.child("Hebrew Name").value.toString()
 
-                    description = dataSnap.child("description").value.toString()
+                        val englishAttName = dataSnap.child("Name").value.toString()
 
-                    val distance = getDistance(currentLatLong.latitude,currentLatLong.longitude,latitude,longitude)
-                    //Log.d(TAG_DB, "getDeviceLocation: lat = ${currentLatLong.latitude}, ${currentLatLong.longitude}")
+                        val latitude = dataSnap.child("latitude").value.toString().toDouble()
 
-                   // val snippet = " שם אטרקציה:  $hebrewName\n קטגוריה:  $category\n  מרחק ליעד:  $distance\n"
+                        val longitude = dataSnap.child("Longitude").value.toString().toDouble()
+                        //latLngCoordinates.add(LatLng(latitude,longitude))
 
-                    // googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(requireContext()))
+                      //  description = dataSnap.child("description").value.toString()
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!))
-                    {
-                        val snippet = " שם אטרקציה:  $hebrewName\n קטגוריה:  $category\n מרחק ליעד:  $distance\n"
-                        googleMap.addMarker(MarkerOptions().position(LatLng(latitude,longitude))
-                                .title(hebrewName)
-                                .snippet(snippet))
+                    if (::currentLatLong.isInitialized) {
+                        //Log.d(TAG_DB, "getDeviceLocation: if = True --> lat = ${currentLatLong.latitude}, ${currentLatLong.longitude}")
+                        distance = getDistance(currentLatLong.latitude, currentLatLong.longitude, latitude, longitude)
+                    } else {
+                        //Log.d(TAG_DB, "getDeviceLocation: if = false --> lat = ${rememberLastCurrentLatLong.latitude}, ${rememberLastCurrentLatLong.longitude}")
+                        currentLatLong = rememberLastCurrentLatLong
+                        distance = getDistance(currentLatLong.latitude, currentLatLong.longitude, latitude, longitude)
                     }
-                    else
-                    {
-                        val snippet = "Attraction Name: $englishAttName\nCategory: $englishCategoryName\ndistance: $distance\n"
-                        googleMap.addMarker(MarkerOptions().position(LatLng(latitude,longitude))
-                                .title(englishAttName)
-                                .snippet(snippet))
-                    }
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!)) {
+                            val snippet = " שם אטרקציה:  $hebrewName\n קטגוריה:  $category\n מרחק ליעד:  $distance\n"
+                            googleMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude))
+                                    .title(hebrewName)
+                                    .snippet(snippet))
+                        } else {
+                            val snippet = "Attraction Name: $englishAttName\nCategory: $englishCategoryName\ndistance: $distance\n"
+                            googleMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude))
+                                    .title(englishAttName)
+                                    .snippet(snippet))
+                        }
+             //       }
                 }
             }
 
@@ -306,8 +426,9 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     }
 
 
+
     override fun onInfoWindowClick(p0: Marker) {
-        Log.w(TAG_DB, "onInfoWindowClick: In function, description = ${p0.title})" )
+        //Log.w(TAG_DB, "onInfoWindowClick: In function, description = ${p0.title})" )
         /* TODO : Option 1: Click on the info window will show more info about the attraction
                   Option 2: Click on the info window will open the browser on the blog website with more details about the attractions
                   Option 3: Click on the info window will make route from our location to the attraction
@@ -316,6 +437,9 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         //val intent = Intent(Intent.ACTION_VIEW, Uri.parse(description))
         // startActivity(intent)
     }
+
+
+
 
 
     private fun getDistance(startLat: Double, startLon: Double, endLat: Double, endLon: Double): String
@@ -352,17 +476,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentMainBinding.inflate(layoutInflater)
 
-        firebaseAuth = FirebaseAuth.getInstance()
-
-
-        return binding.root
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
@@ -370,18 +484,22 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                 // navigate to settings screen
                 firebaseAuth.signOut()
                 findNavController(binding.root).navigate(R.id.action_mainFragment_to_loginFragment)
-
+                flag = 0
                 true
             }
             R.id.helpus -> {
                 findNavController(binding.root).navigate(R.id.action_mainFragment_to_help_us_improve)
+                flag = 0
                 return true
             }
             R.id.update -> {
                 findNavController(binding.root).navigate(R.id.action_mainFragment_to_fragment_keep_us_posted)
+                flag = 0
                 return true
             }
             R.id.filter -> {
+                flag = 1
+                Log.w("filter", "in tafrit flag = $flag")
                 findNavController(binding.root).navigate(R.id.action_mainFragment_to_filtterAttraction)
                 return true
             }
@@ -389,9 +507,6 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-
-
 
 }
 
