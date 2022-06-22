@@ -38,7 +38,9 @@ class HelpUsFragment : Fragment() {
         return binding.root
     }
     private fun setSubmissionListener(submitBtn: Button) {
-        binding.submit.setOnClickListener{submitFeedback()}
+        binding.submit.setOnClickListener{
+            submitFeedback()
+        }
 
     }
     private fun setBackListener(back: ImageView){
@@ -51,7 +53,7 @@ class HelpUsFragment : Fragment() {
         database = FirebaseDatabase.getInstance().getReference("Feedbacks")
         val submition = Feedbacks(feedback.text.toString())
         database.child("feedbacks").push().setValue(submition).addOnSuccessListener {
-            Toast.makeText(context,"We saved your feedback, Thank you for your time!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context,R.string.thank1, Toast.LENGTH_SHORT).show()
         }
         findNavController().navigate(R.id.action_helpFragment_to_mainFragment)
     }
