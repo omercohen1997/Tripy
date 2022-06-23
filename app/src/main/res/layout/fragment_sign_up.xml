@@ -142,6 +142,7 @@
                 android:paddingStart="8dp"
                 android:drawablePadding="8dp"
                 android:id="@+id/password"
+                android:inputType="textPassword"
               />
 
 
@@ -159,6 +160,7 @@
             android:paddingStart="8dp"
             android:drawablePadding="8dp"
             android:id="@+id/cnfPassword"
+            android:inputType="textPassword"
             />
 
 
