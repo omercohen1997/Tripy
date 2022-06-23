@@ -14,15 +14,12 @@
         </item>
         <item android:id="@+id/helpus"
             android:title="@string/help">
-
         </item>
-
         <item android:id="@+id/update"
             android:title="@string/updates">
         </item>
         <item android:id="@+id/logout"
             android:title="@string/logout">
         </item>
-
-
+        
 </menu>
