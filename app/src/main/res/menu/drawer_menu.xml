@@ -9,9 +9,7 @@
          <item android:id="@+id/filter"
             android:title="@string/filter">
         </item>
-        <item android:id="@+id/history"
-            android:title="@string/history">
-        </item>
+
         <item android:id="@+id/helpus"
             android:title="@string/help">
         </item>
