@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Tripy</string>
 
-    <string name="google_maps_key">AIzaSyAXp24n1kRToB3s1AHHeyiB_tQczScOC5o</string>
+    <string name="google_maps_key">AIzaSyBqkHQ3d0ihxoH5h6vdo5lucHMrhkLT0qA</string>
 
     <string name="login_email">Email</string>
     <string name="password">Password</string>

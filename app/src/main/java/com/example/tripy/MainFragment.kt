@@ -41,6 +41,7 @@ import kotlin.properties.Delegates
 
 object MySingleton {
     lateinit var rememberLastCurrentLatLong: LatLng
+
 }
 
 class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickListener{

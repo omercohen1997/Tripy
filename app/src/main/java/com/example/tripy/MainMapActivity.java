@@ -21,7 +21,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.ktx.Firebase;
 
-public class MainMapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainMapActivity extends AppCompatActivity implements OnMapReadyCallback, TaskLoadedCallBack {
 
     GoogleMap map;
     Button btnGetDirection;
@@ -38,6 +38,21 @@ public class MainMapActivity extends AppCompatActivity implements OnMapReadyCall
         place1 = new MarkerOptions().position(new LatLng(32.0133239,34.7479175)).title("Location 1");
         place2 = new MarkerOptions().position(new LatLng(32.0154345,34.7580456)).title("Location 2");
 
+        //Fetching API
+        String url = getUrl(place1.getPosition(), place2.getPosition(),"driving");
+        new FetchURL(MainMapActivity.this).execute(url, "driving");
+
+    }
+
+    //building the api
+    private String getUrl(LatLng origin, LatLng dest, String directionMode) {
+        String str_origin = "origin=" + origin.latitude + ", " + origin.longitude;
+        String str_dest = "destination=" + dest.latitude + ", " + dest.longitude;
+        String mode = "mode=" + directionMode;
+        String parameters = str_origin+ "&" + str_dest + "&" + mode;
+        //String output = "json";
+        String url = "https://maps.googleapis.com/maps/api/directions/json?" + parameters + "&key=" + getString(R.string.google_maps_key);
+        return url;
     }
 
     @Override
@@ -46,4 +61,10 @@ public class MainMapActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
 
+    @Override
+    public void onTaskDone(Object... values) {
+        if (currentPolyline!=null)
+            currentPolyline.remove();
+        currentPolyline = map.addPolyline((PolylineOptions) values[0]);
+    }
 }

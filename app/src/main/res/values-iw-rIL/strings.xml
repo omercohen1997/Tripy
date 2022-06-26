@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">טריפי</string>
 
-    <string name="google_maps_key">AIzaSyAXp24n1kRToB3s1AHHeyiB_tQczScOC5o</string>
+    <string name="google_maps_key">AIzaSyBqkHQ3d0ihxoH5h6vdo5lucHMrhkLT0qA</string>
 
     <string name="login_email">אימייל</string>
     <string name="password">סיסמה</string>
