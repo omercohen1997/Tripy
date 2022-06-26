@@ -49,7 +49,21 @@
         <action
             android:id="@+id/action_mainFragment_to_fragment_keep_us_posted2"
             app:destination="@id/fragment_keep_us_posted" />
+        <action
+            android:id="@+id/action_mainFragment_buildRoute"
+            app:destination="@+id/buildRoute"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/buildRoute"
+        android:name="com.example.tripy.MainMapActivity"
+        android:label="fragment_buildRoute"
+        tools:layout="@layout/main_map_activity" >
+        <action
+            android:id="@+id/action_helpFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+
     <fragment
         android:id="@+id/helpFragment"
         android:name="com.example.tripy.HelpUsFragment"

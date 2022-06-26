@@ -342,7 +342,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                                         .title(hebrewName)
                                         .snippet(snippet))
                             } else {
-                                val snippet = "Attraction Name: $englishAttName\nCategory: $englishCategoryName\ndistance: $distance\n"
+                                val snippet = "Attraction Name: $englishAttName\nCategory: $englishCategoryName\nDistance: $distance\n"
                                 googleMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude))
                                         .title(englishAttName)
                                         .snippet(snippet))
@@ -504,6 +504,12 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                 flag = 1
                 Log.w("filter", "in tafrit flag = $flag")
                 findNavController(binding.root).navigate(R.id.action_mainFragment_to_filtterAttraction)
+                return true
+            }
+
+            R.id.build -> {
+                flag = 1
+                findNavController(binding.root).navigate(R.id.action_mainFragment_buildRoute)
                 return true
             }
 

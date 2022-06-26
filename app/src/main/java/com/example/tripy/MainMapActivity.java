@@ -1,7 +1,6 @@
 package com.example.tripy;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
@@ -28,12 +27,21 @@ public class MainMapActivity extends AppCompatActivity implements OnMapReadyCall
     MarkerOptions place1, place2;
     Polyline currentPolyline;
 
+    String FIREBASE_URL = "https://tripy-9cb98-default-rtdb.firebaseio.com/";
+    Firebase firebase;
+
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_map_activity);
+
+        //Obtain the SupportMapFragment and get notified when the map is ready to be used
+        if(!FirebaseApp.getApps(this).isEmpty()) {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);}
+
         btnGetDirection = findViewById(R.id.btnGetDirection);
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
         mapFragment.getMapAsync(this);
+
         //initializing 2 places on the map
         place1 = new MarkerOptions().position(new LatLng(32.0133239,34.7479175)).title("Location 1");
         place2 = new MarkerOptions().position(new LatLng(32.0154345,34.7580456)).title("Location 2");
