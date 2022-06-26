@@ -83,7 +83,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         binding = FragmentMainBinding.inflate(layoutInflater)
 
         firebaseAuth = FirebaseAuth.getInstance()
@@ -408,7 +408,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                                     .title(hebrewName)
                                     .snippet(snippet))
                         } else {
-                            val snippet = "Attraction Name: $englishAttName\nCategory: $englishCategoryName\ndistance: $distance\n"
+                            val snippet = "Attraction Name: $englishAttName\nCategory: $englishCategoryName\nDistance: $distance\n"
                             googleMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude))
                                     .title(englishAttName)
                                     .snippet(snippet))

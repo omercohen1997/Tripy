@@ -58,11 +58,11 @@
 
     <fragment
         android:id="@+id/buildRoute"
-        android:name="com.example.tripy.MainMapActivity"
+        android:name="com.example.tripy.MainMapActivityFragment"
         android:label="main_map_activity"
         tools:layout="@layout/main_map_activity" >
         <action
-            android:id="@+id/action_mainFragment_buildRoute"
+            android:id="@+id/action_mainFragment_buildRoute_to_mainFragment"
             app:destination="@id/mainFragment" />
     </fragment>
 
