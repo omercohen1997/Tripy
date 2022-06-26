@@ -38,9 +38,6 @@
 
     </LinearLayout>
 
-
-
-
     <LinearLayout
         android:layout_width="275dp"
         android:layout_height="300dp"
@@ -173,13 +170,7 @@
             android:textSize="13sp"
             android:text="@string/tosign"
             android:id="@+id/signBtn"/>
-
-
-
     </LinearLayout>
-
-
-
 
     <View
         android:layout_width="match_parent"

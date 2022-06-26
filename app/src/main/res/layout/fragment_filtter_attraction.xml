@@ -5,20 +5,6 @@
     android:background="@drawable/homepage_background"
     android:orientation="vertical">
 
-<!--        <LinearLayout-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:weightSum="2">-->
-<!--            <ImageView-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:src="@drawable/ic_baseline_arrow_back_24"-->
-<!--                android:id="@+id/arrowback"-->
-<!--                android:layout_weight=".25"-->
-<!--                android:layout_marginStart="5dp"-->
-<!--                android:layout_gravity="center"-->
-<!--                android:padding="15dp"/>-->
     <LinearLayout
         android:id="@+id/l1"
         android:layout_width="match_parent"
@@ -42,7 +28,7 @@
                 android:textSize="22sp"
                 android:padding="10dp"
                 android:textStyle="bold"
-                android:textColor="@color/purple_700"
+                android:textColor="@color/blackkkk"
                 android:gravity="center"/>
 
 <!--        </LinearLayout>-->
@@ -100,7 +86,7 @@
             android:layout_height="wrap_content"
             android:text="@string/shows"
             android:layout_marginStart="20dp"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"
           />
 
@@ -112,7 +98,7 @@
             android:layout_marginStart="20dp"
             android:layout_height="wrap_content"
             android:text="@string/historical_sites"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"/>
     </LinearLayout>
     <LinearLayout
@@ -130,7 +116,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/nature"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"/>
         <CheckBox
             android:layout_width="0dp"
@@ -141,7 +127,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/agri"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"/>
     </LinearLayout>
     <LinearLayout
@@ -159,7 +145,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/observ"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"/>
         <CheckBox
             android:layout_width="0dp"
@@ -170,7 +156,7 @@
             android:id="@+id/checkBox6"
             android:layout_gravity="center"
             android:text="@string/stores"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"/>
     </LinearLayout>
     <LinearLayout
@@ -187,7 +173,7 @@
             android:id="@+id/checkBox7"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/national"             android:textColor="@color/purple_700"
+            android:text="@string/national"             android:textColor="@color/blackkkk"
             android:textStyle="bold"        />
         <CheckBox
             android:layout_width="0dp"
@@ -199,7 +185,7 @@
             android:layout_gravity="center"
             android:text="@string/cities"
 
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"/>
     </LinearLayout>
     <LinearLayout
@@ -217,7 +203,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/beaches"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"/>
         <CheckBox
             android:layout_width="0dp"
@@ -228,7 +214,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/ports"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"/>
     </LinearLayout>
     <LinearLayout
@@ -246,7 +232,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/meu"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"/>
         <CheckBox
             android:layout_width="0dp"
@@ -257,7 +243,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/water"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"/>
     </LinearLayout>
     <LinearLayout
@@ -275,7 +261,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/zoo"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"/>
         <CheckBox
             android:layout_width="0dp"
@@ -286,7 +272,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/parks"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"/>
     </LinearLayout>
     <LinearLayout
@@ -304,7 +290,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/safed"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"/>
         <CheckBox
             android:layout_width="0dp"
@@ -315,7 +301,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/telaviv"
-            android:textColor="@color/purple_700"
+            android:textColor="@color/blackkkk"
             android:textStyle="bold"/>
     </LinearLayout>
 

@@ -13,7 +13,7 @@
 
     <Button
         android:id="@+id/btnGetDirection"
-        android:text="Get Direction"
+        android:text="Get Directions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

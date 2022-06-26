@@ -73,4 +73,5 @@
     <string name="please2">נא הכנס שם של אטרקציה</string>
     <string name="thank1">שמרנו את הפידבק שלך, תודה על הקדשת הזמן!</string>
     <string name="thank2">שמרנו את העידכונים שלך, תודה על הקדשת הזמן!</string>
+    <string name="GetDirection">נווט</string>
 </resources>

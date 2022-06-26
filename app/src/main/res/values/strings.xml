@@ -73,6 +73,6 @@
     <string name="thank2">We saved your updates, Thank you for your time!</string>
     <string name="please">Please select type of attraction</string>
 
-    <string name="btnGetDirection">Get Directions</string>
+    <string name="GetDirection">Get Directions</string>
 
 </resources>
