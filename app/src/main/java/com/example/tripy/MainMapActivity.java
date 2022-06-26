@@ -1,12 +1,14 @@
 package com.example.tripy;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.tripy.databinding.MainMapActivityBinding;
 import com.example.tripy.helpers.FetchURL;
 import com.example.tripy.helpers.TaskLoadedCallBack;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,6 +35,11 @@ public class MainMapActivity extends AppCompatActivity implements OnMapReadyCall
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_map_activity);
+
+        //Binding
+        com.example.tripy.databinding.MainMapActivityBinding binding = MainMapActivityBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
 
         //Obtain the SupportMapFragment and get notified when the map is ready to be used
         if(!FirebaseApp.getApps(this).isEmpty()) {

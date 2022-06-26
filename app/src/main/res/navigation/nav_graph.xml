@@ -17,6 +17,7 @@
             android:id="@+id/action_loginFragment_to_mainFragment"
             app:destination="@id/mainFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.example.tripy.SignUpFragment"
@@ -29,6 +30,7 @@
             android:id="@+id/action_signUpFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.example.tripy.MainFragment"
@@ -57,10 +59,10 @@
     <fragment
         android:id="@+id/buildRoute"
         android:name="com.example.tripy.MainMapActivity"
-        android:label="fragment_buildRoute"
+        android:label="main_map_activity"
         tools:layout="@layout/main_map_activity" >
         <action
-            android:id="@+id/action_helpFragment_to_mainFragment"
+            android:id="@+id/action_mainFragment_buildRoute"
             app:destination="@id/mainFragment" />
     </fragment>
 

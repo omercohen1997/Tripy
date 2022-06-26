@@ -38,10 +38,8 @@ import com.google.firebase.database.*
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
-
 object MySingleton {
     lateinit var rememberLastCurrentLatLong: LatLng
-
 }
 
 class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickListener{
@@ -70,7 +68,6 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     // firebase realtime database variable
     private lateinit var database : DatabaseReference
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
         super.onCreate(savedInstanceState)
@@ -95,7 +92,6 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
             requestLocationPermission()
         }
-
 
         return binding.root
     }
@@ -508,8 +504,9 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
             }
 
             R.id.build -> {
-                flag = 1
+
                 findNavController(binding.root).navigate(R.id.action_mainFragment_buildRoute)
+                flag = 0
                 return true
             }
 
