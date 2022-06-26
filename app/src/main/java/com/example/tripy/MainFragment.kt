@@ -86,7 +86,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentMainBinding.inflate(layoutInflater)
 
         firebaseAuth = FirebaseAuth.getInstance()
@@ -149,7 +149,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         {
             if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
-                Log.d(TAG,"Permission granted");
+                Log.d(TAG,"Permission granted")
                 checkEnableGps()
             }
             else
