@@ -14,17 +14,13 @@ import com.example.tripy.databinding.FragmentHelpUsImproveBinding
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
-
 class HelpUsFragment : Fragment() {
     private lateinit var binding:FragmentHelpUsImproveBinding
     private lateinit var database: DatabaseReference
     private lateinit var feedback: EditText
     private lateinit var back: ImageView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+    override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,12 +33,14 @@ class HelpUsFragment : Fragment() {
         setBackListener(back)
         return binding.root
     }
+
     private fun setSubmissionListener(submitBtn: Button) {
         binding.submit.setOnClickListener{
             submitFeedback()
         }
 
     }
+
     private fun setBackListener(back: ImageView){
         back.setOnClickListener {
             findNavController().navigate(R.id.action_helpFragment_to_mainFragment)
@@ -57,6 +55,4 @@ class HelpUsFragment : Fragment() {
         }
         findNavController().navigate(R.id.action_helpFragment_to_mainFragment)
     }
-
-
 }

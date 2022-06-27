@@ -34,6 +34,7 @@ public class MainMapActivity extends AppCompatActivity implements OnMapReadyCall
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setContentView(R.layout.activity_main);
         setContentView(R.layout.main_map_activity);
 
         //Binding
@@ -46,7 +47,8 @@ public class MainMapActivity extends AppCompatActivity implements OnMapReadyCall
             FirebaseDatabase.getInstance().setPersistenceEnabled(true);}
 
         btnGetDirection = findViewById(R.id.btnGetDirection);
-        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
+        //MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         //initializing 2 places on the map

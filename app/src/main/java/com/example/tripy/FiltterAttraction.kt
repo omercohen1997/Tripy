@@ -52,8 +52,6 @@ class FiltterAttraction : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -80,13 +78,12 @@ class FiltterAttraction : Fragment() {
     private fun setBackListener(back:ImageView){
         back.setOnClickListener {
             var chosenAttractionsArraylist = ArrayList<String>()
-            // שהמשתמש לוחץ על החץ אחורה אז זה לא שומר את הפליטרים שהוא עשה ומעביר חזרה למיי פרגמנט מערך ריק כדי שהוא ידע שם שהוא צריך להציג את כל האטרקציות
+            // שהמשתמש לוחץ על החץ אחורה אז זה לא שומר את הפליטרים שהוא עשה ומעביר חזרה למיין פרגמנט מערך ריק כדי שהוא ידע שם שהוא צריך להציג את כל האטרקציות
             findNavController(binding.root).navigate(R.id.action_filtterAttraction_to_mainFragment,Bundle().apply {
                 putStringArrayList("categoryFilerKey",chosenAttractionsArraylist)
         })
         }
     }
-
 
     //the logic to clear all
     private fun setClearAllListener(clearAll: Button) {
@@ -119,9 +116,5 @@ class FiltterAttraction : Fragment() {
                putStringArrayList("categoryFilerKey",chosenAttractionsArraylist)
             })
         }
-
     }
-
-
-
 }

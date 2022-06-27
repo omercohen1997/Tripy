@@ -1,7 +1,6 @@
 package com.example.tripy
 
 import android.Manifest
-import android.R.attr.password
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -10,13 +9,10 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import android.text.InputType
 import android.util.Log
 import android.view.*
-import android.widget.ImageView
-import androidx.appcompat.app.ActionBar
+import android.widget.Button
 import androidx.core.app.ActivityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
 import com.example.tripy.MySingleton.rememberLastCurrentLatLong
@@ -36,7 +32,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlin.math.roundToInt
-import kotlin.properties.Delegates
 
 object MySingleton {
     lateinit var rememberLastCurrentLatLong: LatLng
@@ -51,9 +46,10 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     private lateinit var locationRequest: LocationRequest
     private lateinit var currentLatLong : LatLng
     private lateinit var  description : String
+
     private var fragmentFilterArrayList = ArrayList<String>()   // saving in array list the categories the use chose in FilterAttraction fragment
 
-    //private var selected
+    private var selectedLocations = ArrayList<String>() // saving selected locations in array
 
     private val LOCATION_PERMISSION_REQUEST_CODE = 1234
     private val TAG = "MapActivity"
@@ -62,29 +58,21 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
 
     private lateinit var mMap:GoogleMap
 
+    private lateinit var directionBtn: Button
+
     // current location vars
     private lateinit var lastLocation1 : Location
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
-    // firebase realtime database variable
-    private lateinit var database : DatabaseReference
+    private lateinit var database : DatabaseReference // firebase realtime database variable
 
+    //Empty constructor
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
         super.onCreate(savedInstanceState)
-        /*
-        if(isGooglePlayServicesAvailable()) {
-            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-            requestLocationPermission()
-        }
-
-         */
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentMainBinding.inflate(layoutInflater)
 
         firebaseAuth = FirebaseAuth.getInstance()
@@ -111,8 +99,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         return true
     }
 
-    private fun requestLocationPermission()
-    {
+    private fun requestLocationPermission() {
         Log.d(TAG, "In requestLocationPermission")
 
         val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
@@ -139,8 +126,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     }
 
     @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
-    {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         Log.d(TAG, "In onRequestPermission")
         if(requestCode == LOCATION_PERMISSION_REQUEST_CODE)
         {
@@ -226,7 +212,10 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         mMap.uiSettings.isMapToolbarEnabled = false
         getDeviceCurrentLocation()
 
-        // 1 = אומר שהמשתמש נכנס לעמוד של הפילטרים , אם הוא לא בחר כלום אז הפונצנקציה שמראה את כל האטרקציות נקראת , אחרת הוא מפלטר לפי הפונקציה השנייה עם המערך של הקטגוריות שהוא בחר שחוזר מהפרגמנט
+        directionBtn.visibility = View.INVISIBLE
+
+        // flag 1 means: if the user doesn't select any filters = the function that shows all the attractions is called
+        // else = it filters according to the second function with the array of categories he chose that returns from the fragment
         if(flag == 1) {
             fragmentFilterArrayList = retrieveCategoryFilter()
             if(fragmentFilterArrayList.isNotEmpty())
@@ -236,11 +225,18 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         }
         else
             readDataFromFirebase(mMap)
-
         mMap.setOnInfoWindowClickListener(this)
 
-    }
+        if (flag == 2){
+            directionBtn.visibility = View.VISIBLE
+            //selectedLocations = retrieveSelected()
+            //if (selectedLocations.isNotEmpty())
+                //readDataFromFirebaseByCategory(mMap,selectedLocations)
+            //else
+                //readDataFromFirebase(mMap)
 
+        }
+    }
 
     private fun getDeviceCurrentLocation() {
         Log.d(TAG, "getDeviceLocation: getting the devices current location")
@@ -270,20 +266,16 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
             else
                 Log.d(TAG, "getDeviceCurrentLocation: current location is null")
         }
-
     }
-
 
     private fun moveCamera(latLng: LatLng, zoom: Float) {
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoom))
     }
 
-
     fun isRTL(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            (context.resources.configuration.layoutDirection
-                    === View.LAYOUT_DIRECTION_RTL)
+            (context.resources.configuration.layoutDirection === View.LAYOUT_DIRECTION_RTL)
             // Another way:
             // Define a boolean resource as "true" in res/values-ldrtl
             // and "false" in res/values
@@ -301,13 +293,14 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(requireContext()))
 
         database = FirebaseDatabase.getInstance().getReference("Attractions")
+
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (dataSnap in dataSnapshot.children) {
                     val hebrewCategory = dataSnap.child("Category").value.toString()
                     val englishCategoryName = dataSnap.child("English Category").value.toString()
 
-                    for (categoryFilter in categoryFilterArrayList)
+                    for (categoryFilter in categoryFilterArrayList) {
                         if (categoryFilter == englishCategoryName || categoryFilter == hebrewCategory) {
 
                             val hebrewName = dataSnap.child("Hebrew Name").value.toString()
@@ -323,28 +316,47 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
 
                             if (::currentLatLong.isInitialized) {
                                 //Log.d(TAG_DB, "getDeviceLocation: if = True --> lat = ${currentLatLong.latitude}, ${currentLatLong.longitude}")
-                                distance = getDistance(currentLatLong.latitude, currentLatLong.longitude, latitude, longitude)
+                                distance = getDistance(
+                                    currentLatLong.latitude,
+                                    currentLatLong.longitude,
+                                    latitude,
+                                    longitude
+                                )
                             } else {
                                 //Log.d(TAG_DB, "getDeviceLocation: if = false --> lat = ${rememberLastCurrentLatLong.latitude}, ${rememberLastCurrentLatLong.longitude}")
                                 currentLatLong = rememberLastCurrentLatLong
-                                distance = getDistance(currentLatLong.latitude, currentLatLong.longitude, latitude, longitude)
+                                distance = getDistance(
+                                    currentLatLong.latitude,
+                                    currentLatLong.longitude,
+                                    latitude,
+                                    longitude
+                                )
                             }
-
 
                             // googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(requireContext()))
 
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!)) {
-                                val snippet = " שם אטרקציה:  $hebrewName\n קטגוריה:  $hebrewCategory\n מרחק ליעד:  $distance\n"
-                                googleMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude))
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(
+                                    activity!!
+                                )
+                            ) {
+                                val snippet =
+                                    " שם אטרקציה:  $hebrewName\n קטגוריה:  $hebrewCategory\n מרחק ליעד:  $distance\n"
+                                googleMap.addMarker(
+                                    MarkerOptions().position(LatLng(latitude, longitude))
                                         .title(hebrewName)
-                                        .snippet(snippet))
+                                        .snippet(snippet)
+                                )
                             } else {
-                                val snippet = "Attraction Name: $englishAttName\nCategory: $englishCategoryName\nDistance: $distance\n"
-                                googleMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude))
+                                val snippet =
+                                    "Attraction Name: $englishAttName\nCategory: $englishCategoryName\nDistance: $distance\n"
+                                googleMap.addMarker(
+                                    MarkerOptions().position(LatLng(latitude, longitude))
                                         .title(englishAttName)
-                                        .snippet(snippet))
+                                        .snippet(snippet)
+                                )
                             }
                         }
+                    }
                 }
             }
 
@@ -365,9 +377,27 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         return retrieveCategoryArrayList
         }
 
+    // retrieve the selected locations from array
+    private fun retrieveSelected(): ArrayList<String> {
+        //selectedLocations
+        var retrieveSelectedArrayList = ArrayList<String>()
+        if(flag == 2){
+            retrieveSelectedArrayList = requireArguments().getStringArrayList("locationID") as ArrayList<String>
+        }
+        return retrieveSelectedArrayList
+    } //TODO
 
-    private fun readDataFromFirebase(googleMap: GoogleMap)
-    {
+    private fun setVisibilityForButton(shouldHide: Boolean){
+        //directionBtn = binding.btnGetDirection
+        if(shouldHide){
+            //hide
+        } else {
+            //not hide
+        }
+
+    }
+
+    private fun readDataFromFirebase(googleMap: GoogleMap) {
         lateinit var  distance : String
         Log.w(TAG_DB, "In readDataFromFirebase")
         googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(requireContext()))
@@ -425,25 +455,17 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         })
     }
 
-
-
     override fun onInfoWindowClick(p0: Marker) {
         //Log.w(TAG_DB, "onInfoWindowClick: In function, description = ${p0.title})" )
         /* TODO : Option 1: Click on the info window will show more info about the attraction
                   Option 2: Click on the info window will open the browser on the blog website with more details about the attractions
                   Option 3: Click on the info window will make route from our location to the attraction
         */
-
         //val intent = Intent(Intent.ACTION_VIEW, Uri.parse(description))
         // startActivity(intent)
-    }
+    } // TODO
 
-
-
-
-
-    private fun getDistance(startLat: Double, startLon: Double, endLat: Double, endLon: Double): String
-    {
+    private fun getDistance(startLat: Double, startLon: Double, endLat: Double, endLon: Double): String {
         val results = FloatArray(1)
         val roundOff : Float
         val distanceInKm : Float
@@ -470,18 +492,14 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
 
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.drawer_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.logout -> {
-                // navigate to settings screen
+            R.id.logout -> { // navigate to settings screen
                 firebaseAuth.signOut()
                 findNavController(binding.root).navigate(R.id.action_mainFragment_to_loginFragment)
                 flag = 0
@@ -503,17 +521,13 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                 findNavController(binding.root).navigate(R.id.action_mainFragment_to_filtterAttraction)
                 return true
             }
-
             R.id.build -> {
-
+                flag = 2
                 findNavController(binding.root).navigate(R.id.action_mainFragment_to_buildRoute)
-                flag = 0
                 return true
             }
 
             else -> super.onOptionsItemSelected(item)
         }
     }
-
 }
-
