@@ -52,7 +52,7 @@
             android:id="@+id/action_mainFragment_to_fragment_keep_us_posted2"
             app:destination="@id/fragment_keep_us_posted" />
         <action
-            android:id="@+id/action_mainFragment_buildRoute"
+            android:id="@+id/action_mainFragment_to_buildRoute"
             app:destination="@+id/buildRoute"/>
     </fragment>
 

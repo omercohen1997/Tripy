@@ -73,6 +73,6 @@
     <string name="thank2">We saved your updates, Thank you for your time!</string>
     <string name="please">Please select type of attraction</string>
 
-    <string name="GetDirection">Get Directions</string>
-
+    <string name="getDirection">Get Directions</string>
+    <string name="buildYourR">Build Your Route!</string>
 </resources>

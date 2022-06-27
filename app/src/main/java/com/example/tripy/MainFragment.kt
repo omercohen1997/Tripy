@@ -53,6 +53,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     private lateinit var  description : String
     private var fragmentFilterArrayList = ArrayList<String>()   // saving in array list the categories the use chose in FilterAttraction fragment
 
+    //private var selected
 
     private val LOCATION_PERMISSION_REQUEST_CODE = 1234
     private val TAG = "MapActivity"
@@ -455,16 +456,16 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!))
                 "$roundOff קילומטר "
             else
-                "$roundOff kilometer"
+                "$roundOff kilometers"
         }
         else
         {
             distanceInKm = results[0] / 1000
             roundOff = ((distanceInKm * 100.0).roundToInt() / 100.0).toFloat()
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!))
-                "$roundOff מטרים "
+                "$roundOff מטר "
             else
-                "$roundOff meter"
+                "$roundOff meters"
         }
 
     }
@@ -505,7 +506,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
 
             R.id.build -> {
 
-                findNavController(binding.root).navigate(R.id.action_mainFragment_buildRoute)
+                findNavController(binding.root).navigate(R.id.action_mainFragment_to_buildRoute)
                 flag = 0
                 return true
             }
