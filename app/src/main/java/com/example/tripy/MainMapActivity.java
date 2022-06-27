@@ -51,7 +51,7 @@ public class MainMapActivity extends AppCompatActivity implements OnMapReadyCall
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        //initializing 2 places on the map
+        //initializing 2 places on the map ---------------- FOR TESTING
         place1 = new MarkerOptions().position(new LatLng(32.0133239,34.7479175)).title("Location 1");
         place2 = new MarkerOptions().position(new LatLng(32.0154345,34.7580456)).title("Location 2");
 

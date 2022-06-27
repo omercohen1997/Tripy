@@ -58,7 +58,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
 
     private lateinit var mMap:GoogleMap
 
-    private lateinit var directionBtn: Button
+    //private lateinit var directionBtn: Button
 
     // current location vars
     private lateinit var lastLocation1 : Location
@@ -197,22 +197,20 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         }
     }
 
-    private fun initMap()
-    {
+    private fun initMap() {
         Log.d(TAG, "initMap: initializing map")
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
-    override fun onMapReady(googleMap: GoogleMap)
-    {
+    override fun onMapReady(googleMap: GoogleMap) {
         Log.d(TAG, "onMapReady: map is ready")
         mMap = googleMap
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.uiSettings.isMapToolbarEnabled = false
         getDeviceCurrentLocation()
 
-        directionBtn.visibility = View.INVISIBLE
+        //directionBtn.visibility = View.INVISIBLE
 
         // flag 1 means: if the user doesn't select any filters = the function that shows all the attractions is called
         // else = it filters according to the second function with the array of categories he chose that returns from the fragment
@@ -228,7 +226,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         mMap.setOnInfoWindowClickListener(this)
 
         if (flag == 2){
-            directionBtn.visibility = View.VISIBLE
+            //directionBtn.visibility = View.VISIBLE
             //selectedLocations = retrieveSelected()
             //if (selectedLocations.isNotEmpty())
                 //readDataFromFirebaseByCategory(mMap,selectedLocations)
@@ -394,8 +392,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         } else {
             //not hide
         }
-
-    }
+    } //TODO
 
     private fun readDataFromFirebase(googleMap: GoogleMap) {
         lateinit var  distance : String
@@ -412,13 +409,9 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                //     if (selectedCategory == englishCategoryName) {
                   //      count++
                        // Log.w(TAG_DB, "$count")
-
                         val hebrewName = dataSnap.child("Hebrew Name").value.toString()
-
                         val englishAttName = dataSnap.child("Name").value.toString()
-
                         val latitude = dataSnap.child("latitude").value.toString().toDouble()
-
                         val longitude = dataSnap.child("Longitude").value.toString().toDouble()
                         //latLngCoordinates.add(LatLng(latitude,longitude))
 
@@ -433,18 +426,17 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                         distance = getDistance(currentLatLong.latitude, currentLatLong.longitude, latitude, longitude)
                     }
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!)) {
-                            val snippet = " שם אטרקציה:  $hebrewName\n קטגוריה:  $category\n מרחק ליעד:  $distance\n"
-                            googleMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude))
-                                    .title(hebrewName)
-                                    .snippet(snippet))
-                        } else {
-                            val snippet = "Attraction Name: $englishAttName\nCategory: $englishCategoryName\nDistance: $distance\n"
-                            googleMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude))
-                                    .title(englishAttName)
-                                    .snippet(snippet))
-                        }
-             //       }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!)) {
+                        val snippet = " שם אטרקציה:  $hebrewName\n קטגוריה:  $category\n מרחק ליעד:  $distance\n"
+                        googleMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude))
+                            .title(hebrewName)
+                            .snippet(snippet))
+                    } else {
+                        val snippet = "Attraction Name: $englishAttName\nCategory: $englishCategoryName\nDistance: $distance\n"
+                        googleMap.addMarker(MarkerOptions().position(LatLng(latitude, longitude))
+                            .title(englishAttName)
+                            .snippet(snippet))
+                    }
                 }
             }
 
@@ -455,7 +447,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         })
     }
 
-    override fun onInfoWindowClick(p0: Marker) {
+    /*override fun onInfoWindowClick(p0: Marker) {
         //Log.w(TAG_DB, "onInfoWindowClick: In function, description = ${p0.title})" )
         /* TODO : Option 1: Click on the info window will show more info about the attraction
                   Option 2: Click on the info window will open the browser on the blog website with more details about the attractions
@@ -463,7 +455,17 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         */
         //val intent = Intent(Intent.ACTION_VIEW, Uri.parse(description))
         // startActivity(intent)
-    } // TODO
+        if (flag == 2){
+
+        }
+    } // TODO*/
+
+    override fun onInfoWindowClick(p0: Marker) {
+        if (flag == 2){
+            //selectedLocations.add(readDataFromFirebase())
+        }
+        //TODO: Add attractions to selectedLocations Array upon clinking when build route is enabled
+    }
 
     private fun getDistance(startLat: Double, startLon: Double, endLat: Double, endLon: Double): String {
         val results = FloatArray(1)
