@@ -51,12 +51,12 @@
         <action
             android:id="@+id/action_mainFragment_to_fragment_keep_us_posted2"
             app:destination="@id/fragment_keep_us_posted" />
-        <action
+<!--        <action
             android:id="@+id/action_mainFragment_to_buildRoute"
-            app:destination="@+id/buildRoute"/>
+            app:destination="@+id/buildRoute"/>-->
     </fragment>
 
-    <fragment
+<!--    <fragment
         android:id="@+id/buildRoute"
         android:name="com.example.tripy.MainMapActivityFragment"
         android:label="main_map_activity"
@@ -64,7 +64,7 @@
         <action
             android:id="@+id/action_mainFragment_buildRoute_to_mainFragment"
             app:destination="@id/mainFragment" />
-    </fragment>
+    </fragment>-->
 
     <fragment
         android:id="@+id/helpFragment"
