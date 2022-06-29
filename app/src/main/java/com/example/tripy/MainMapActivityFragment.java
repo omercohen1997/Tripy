@@ -51,30 +51,4 @@ public class MainMapActivityFragment extends Fragment {
         return inflater.inflate(R.layout.main_map_activity, container, false);
     }
 
-
-//    public void onMapReady(@NonNull GoogleMap googleMap) {
-//        mMap = googleMap;
-//        mDatabaseReference.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//                LatLng newLocation = new LatLng(
-//                        dataSnapshot.child("latitude").getValue(double.class),
-//                        dataSnapshot.child("Longitude").getValue(double.class)
-//                );
-//                mMap.addMarker(new MarkerOptions().position(newLocation).title(dataSnapshot.getKey()));
-//            }
-//
-//            @Override
-//            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
-//            @Override
-//            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) { }
-//            @Override
-//            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {}
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//                throw databaseError.toException();
-//            }
-//        });
-//    }
-
 }
