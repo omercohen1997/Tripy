@@ -76,4 +76,6 @@
     <string name="getDirection">נווט</string>
     <string name="buildYourR">בנה את המסלול שלך!</string>
     <string name="shouldAdd">להוספה למסלול לחץ כאן</string>
+    <string name="cancel">סגור</string>
+    <string name="addToRoute">הוסף נקודה למסלול</string>
 </resources>

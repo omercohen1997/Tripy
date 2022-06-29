@@ -75,4 +75,6 @@
     <string name="getDirection">Get Directions</string>
     <string name="buildYourR">Build Your Route!</string>
     <string name="shouldAdd">Click here to add to route</string>
+    <string name="cancel">Cancel</string>
+    <string name="addToRoute">Add location to route</string>
 </resources>
