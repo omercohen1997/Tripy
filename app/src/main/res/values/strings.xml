@@ -74,4 +74,5 @@
     <string name="please">Please select type of attraction</string>
     <string name="getDirection">Get Directions</string>
     <string name="buildYourR">Build Your Route!</string>
+    <string name="shouldAdd">Click here to add to route</string>
 </resources>
