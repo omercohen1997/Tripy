@@ -39,7 +39,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-database:20.0.5'
     implementation 'androidx.drawerlayout:drawerlayout:1.1.1'
-    implementation 'com.google.firebase:firebase-firestore-ktx:24.1.2'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.2.0'
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.firebase:firebase-database-ktx:20.0.5'
     implementation 'org.chromium.net:cronet-embedded:102.5005.125'
@@ -51,8 +51,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.7.0"
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.navigation:navigation-fragment:2.4.2'
-    implementation 'androidx.navigation:navigation-ui:2.4.2'
+    implementation 'androidx.navigation:navigation-fragment:2.5.0'
+    implementation 'androidx.navigation:navigation-ui:2.5.0'
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
     //implementation 'com.google.maps.android:android-maps-utils:2.3.0 ' // Maps utils (required for custom markers)
     implementation 'com.google.android.gms:play-services-maps:18.0.2' // Google Services
