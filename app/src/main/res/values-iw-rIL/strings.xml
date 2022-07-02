@@ -26,6 +26,7 @@
     <string name="help">הציעו לנו להשתפר</string>
     <string name="history">היסטוריית אתרים</string>
     <string name="build_track">בניית מסלול</string>
+    <string name="clear_track">ניקוי מסלול</string>
     <string name="simplefeedback">אנא מלאו משוב פשוט</string>
     <string name="helpustobebetter">עזרו לנו להיות טובים יותר!</string>
     <string name="keep_us">תנו לנו עדכונים</string>
@@ -80,4 +81,5 @@
     <string name="cancel">סגור</string>
     <string name="addToRoute">הוסף נקודה למסלול</string>
     <string name="emptyMarkerList">אנא הוסיפו לפחות שתי נקודות בכדי לבנות מסלול</string>
+    <string name="clearRouteMessage">המסלול נקי</string>
 </resources>
