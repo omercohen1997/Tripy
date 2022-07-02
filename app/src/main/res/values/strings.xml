@@ -78,5 +78,5 @@
     <string name="shouldAdd">Click here to add to route</string>
     <string name="cancel">Cancel</string>
     <string name="addToRoute">Add location to route</string>
-    <string name="emptyMarkerList">Please add locations to create a route</string>
+    <string name="emptyMarkerList">Please add at least two locations to create a route</string>
 </resources>
