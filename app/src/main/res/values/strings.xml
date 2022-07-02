@@ -26,6 +26,7 @@
     <string name="updates">Keep us posted</string>
     <string name="keep_us">Give us the updates</string>
     <string name="build_track">Build route</string>
+    <string name="clear_track">Clear route</string>
     <string name="update">Update</string>
     <string name="category">Choose category</string>
     <string name="filter">Filter</string>
@@ -79,4 +80,5 @@
     <string name="cancel">Cancel</string>
     <string name="addToRoute">Add location to route</string>
     <string name="emptyMarkerList">Please add at least two locations to create a route</string>
+    <string name="clearRouteMessage">Your route is clear</string>
 </resources>
