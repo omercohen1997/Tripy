@@ -2,17 +2,21 @@ package com.example.tripy
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentSender.SendIntentException
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.*
-import android.widget.Button
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation.findNavController
 import com.example.tripy.MySingleton.rememberLastCurrentLatLong
@@ -26,47 +30,44 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.maps.DirectionsApiRequest
+import com.google.maps.GeoApiContext
+import com.google.maps.internal.PolylineEncoding
+import com.google.maps.model.DirectionsResult
+import com.google.maps.model.TravelMode
 import kotlin.math.roundToInt
+
 
 object MySingleton {
     lateinit var rememberLastCurrentLatLong: LatLng
 }
-
-class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickListener{
-    companion object{
-        var flag = 0
-    }
+//problem was here - make sure class insn't abstract
+class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickListener,GoogleMap.OnPolylineClickListener{
+    companion object{ var flag = 0 }
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var binding: FragmentMainBinding
     private lateinit var locationRequest: LocationRequest
     private lateinit var currentLatLong : LatLng
     private lateinit var  description : String
-
+    private lateinit var mMap:GoogleMap
+    private lateinit var lastLocation1 : Location // current location vars
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var database : DatabaseReference // firebase realtime database variable
+    private var mGeoApiContext : GeoApiContext? = null
     private var fragmentFilterArrayList = ArrayList<String>()   // saving in array list the categories the use chose in FilterAttraction fragment
-
-    private var selectedLocations = ArrayList<String>() // saving selected locations in array
-
+    private var markerList:ArrayList<Marker> = ArrayList() //Array of selected locations
+    private var mPolylinesData:ArrayList<PolylineData> = ArrayList()
+    private var mSelectedMarker: Marker? = null
+    private var markerListString = ArrayList<String>() //TODO Array of selected string locations
     private val LOCATION_PERMISSION_REQUEST_CODE = 1234
     private val TAG = "MapActivity"
     private val TAG_DB = "Database"
     private val REQUEST_CHECK_SETTINGS = 10001
 
-    private lateinit var mMap:GoogleMap
-
-    //private lateinit var directionBtn: Button
-
-    // current location vars
-    private lateinit var lastLocation1 : Location
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-
-    private lateinit var database : DatabaseReference // firebase realtime database variable
-
-    //Empty constructor
+    //Empty constructor required
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
         super.onCreate(savedInstanceState)
@@ -85,6 +86,47 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         return binding.root
     }
 
+    private fun addPolylinesToMap(result: DirectionsResult) {
+        Handler(Looper.getMainLooper()).post(Runnable {
+            Log.d(TAG, "run: result routes: " + result.routes.size)
+            /*if(mPolylinesData.isNotEmpty()){
+                for(polylineData in mPolylinesData){
+                    polylineData.polyline.remove()
+                }
+                mPolylinesData.clear()
+                mPolylinesData = ArrayList() //check it in case of an error - 8.14
+            }*/
+
+            /*var duration = 99999999*/
+
+            for (route in result.routes) {
+                Log.d(TAG, "run: leg: " + route.legs[0].toString())
+                val decodedPath = PolylineEncoding.decode(route.overviewPolyline.encodedPath)
+                val newDecodedPath: MutableList<LatLng> = ArrayList()
+
+                for (latLng in decodedPath) { // This loops through all the LatLng coordinates of ONE polyline.
+                    //Log.d(TAG, "run: latlng: " + latLng.toString())
+                    newDecodedPath.add(LatLng(latLng.lat, latLng.lng))
+                }
+                val polyline: Polyline = mMap.addPolyline(PolylineOptions().addAll(newDecodedPath))
+                polyline.color = ContextCompat.getColor(activity!!, android.R.color.darker_gray)
+                polyline.isClickable = true //select and change color
+
+                mPolylinesData.add(PolylineData(polyline, route.legs[0]))
+
+                onPolylineClick(polyline)
+
+                /*var durationTemp = route.legs[0].duration.inSeconds
+                if(durationTemp < duration){
+                    duration = durationTemp.toInt()
+                    onPolylineClick(polyline)
+                }
+*/
+                mSelectedMarker!!.isVisible = false
+            }
+        })
+    }
+
     // checking if google services install on the device
     private fun isGooglePlayServicesAvailable(): Boolean {
         val googleApiAvailability = GoogleApiAvailability.getInstance()
@@ -101,7 +143,6 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
 
     private fun requestLocationPermission() {
         Log.d(TAG, "In requestLocationPermission")
-
         val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION)
 
@@ -109,14 +150,13 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         {
             android.app.AlertDialog.Builder(requireContext()).setTitle("" +
                     "Location permission denied")
-                    .setMessage("Location permission required for the app to work properly")
-                    .setPositiveButton("ok") { dialogInterface, i ->
-                        Log.d(TAG, "if was true")
-                        requestPermissions(permissions,LOCATION_PERMISSION_REQUEST_CODE)
-                    }
-
-                    .setNegativeButton("cancel") { dialogInterface, i -> dialogInterface.dismiss() }
-                    .create().show()
+                .setMessage("Location permission required for the app to work properly")
+                .setPositiveButton("ok") { dialogInterface, i ->
+                    Log.d(TAG, "if was true")
+                    requestPermissions(permissions,LOCATION_PERMISSION_REQUEST_CODE)
+                }
+                .setNegativeButton("cancel") { dialogInterface, i -> dialogInterface.dismiss() }
+                .create().show()
         }
         else
         {
@@ -130,13 +170,11 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         Log.d(TAG, "In onRequestPermission")
         if(requestCode == LOCATION_PERMISSION_REQUEST_CODE)
         {
-            if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            {
+            if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG,"Permission granted")
                 checkEnableGps()
             }
-            else
-            {
+            else {
                 Log.d(TAG,"Permission denied")
             }
         }
@@ -201,19 +239,25 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         Log.d(TAG, "initMap: initializing map")
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        //used for calculation directions
+        if (mGeoApiContext == null){
+            mGeoApiContext = GeoApiContext.Builder()
+                .apiKey(getString(R.string.google_maps_key))
+                .build()
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         Log.d(TAG, "onMapReady: map is ready")
         mMap = googleMap
+        mMap.setOnPolylineClickListener(this)
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.uiSettings.isMapToolbarEnabled = false
         getDeviceCurrentLocation()
 
-        //directionBtn.visibility = View.INVISIBLE
-
-        // flag 1 means: if the user doesn't select any filters = the function that shows all the attractions is called
-        // else = it filters according to the second function with the array of categories he chose that returns from the fragment
+        // if the user doesn't select any filters = the function that shows all the attractions is called
+        // else it filters according to the second function with the array of categories he chose that returns from the fragment
         if(flag == 1) {
             fragmentFilterArrayList = retrieveCategoryFilter()
             if(fragmentFilterArrayList.isNotEmpty())
@@ -221,19 +265,15 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
             else
                 readDataFromFirebase(mMap)
         }
+        /*if(flag == 2){
+            Log.d(TAG,"I'm here")
+            markerList = retrieveMarkerList()
+            if(markerList.isNotEmpty())
+                readDataFromFirebaseByCategory(mMap, markerListString)
+        }*/
         else
             readDataFromFirebase(mMap)
         mMap.setOnInfoWindowClickListener(this)
-
-        if (flag == 2){
-            //directionBtn.visibility = View.VISIBLE
-            //selectedLocations = retrieveSelected()
-            //if (selectedLocations.isNotEmpty())
-                //readDataFromFirebaseByCategory(mMap,selectedLocations)
-            //else
-                //readDataFromFirebase(mMap)
-
-        }
     }
 
     private fun getDeviceCurrentLocation() {
@@ -242,8 +282,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
 
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED)
-        {
+                != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "getDeviceLocation: no permission")
             return
         }
@@ -251,8 +290,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
       //  Log.d(TAG, "getDeviceLocation: $myVariable")
        // rememberLastLocation = fusedLocationProviderClient.getLastLocation()
         fusedLocationProviderClient.lastLocation.addOnSuccessListener(requireActivity()) { location ->
-            if(location != null)
-            {
+            if(location != null) {
                 Log.d(TAG, "getDeviceLocation: In if(location != null)")
                 lastLocation1 = location
                // rememberLastLocation = lastLocation
@@ -330,20 +368,14 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                                     longitude
                                 )
                             }
-
                             // googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(requireContext()))
-
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(
-                                    activity!!
-                                )
-                            ) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!)) {
                                 val snippet =
                                     " שם אטרקציה:  $hebrewName\n קטגוריה:  $hebrewCategory\n מרחק ליעד:  $distance\n"
                                 googleMap.addMarker(
                                     MarkerOptions().position(LatLng(latitude, longitude))
                                         .title(hebrewName)
-                                        .snippet(snippet)
-                                )
+                                        .snippet(snippet))
                             } else {
                                 val snippet =
                                     "Attraction Name: $englishAttName\nCategory: $englishCategoryName\nDistance: $distance\n"
@@ -357,7 +389,6 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                     }
                 }
             }
-
             override fun onCancelled(databaseError: DatabaseError) {
                 // Getting Post failed, log a message
                 Log.w(TAG_DB, "loadPost:onCancelled", databaseError.toException())
@@ -366,6 +397,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     }
 
     // retrieve the specific categories the user chose from the fragment FilterAttraction
+    //TODO -> use this after clicking on "Build Route"
     private fun retrieveCategoryFilter() : ArrayList<String> {
         var retrieveCategoryArrayList = ArrayList<String>()
         if (flag == 1) { // in case the user did not pick any category filter (all checkboxes are empty)
@@ -376,22 +408,21 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         }
 
     // retrieve the selected locations from array
-    private fun retrieveSelected(): ArrayList<String> {
-        //selectedLocations
-        var retrieveSelectedArrayList = ArrayList<String>()
-        if(flag == 2){
-            retrieveSelectedArrayList = requireArguments().getStringArrayList("locationID") as ArrayList<String>
-        }
-        return retrieveSelectedArrayList
-    } //TODO
+    private fun retrieveMarkerList(markers : ArrayList<Marker>) {
 
-    private fun setVisibilityForButton(shouldHide: Boolean){
-        //directionBtn = binding.btnGetDirection
-        if(shouldHide){
-            //hide
-        } else {
-            //not hide
+        for (i in markers.indices-1){
+            calculateDirections(markers[i],markers[i+1])
         }
+
+        calculateDirections(markerList[0], markerList[1])
+
+        //selectedLocations
+        //var markerList = ArrayList<Marker>()
+        /*if(flag == 2){
+            markerList = requireArguments().getStringArrayList(id.toString()) as ArrayList<Marker>
+            return markerList
+        }
+        return markerList*/
     } //TODO
 
     private fun readDataFromFirebase(googleMap: GoogleMap) {
@@ -447,24 +478,63 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         })
     }
 
-    /*override fun onInfoWindowClick(p0: Marker) {
-        //Log.w(TAG_DB, "onInfoWindowClick: In function, description = ${p0.title})" )
-        /* TODO : Option 1: Click on the info window will show more info about the attraction
-                  Option 2: Click on the info window will open the browser on the blog website with more details about the attractions
-                  Option 3: Click on the info window will make route from our location to the attraction
-        */
-        //val intent = Intent(Intent.ACTION_VIEW, Uri.parse(description))
-        // startActivity(intent)
-        if (flag == 2){
+    //private fun calculateDirections(marker: Marker)
+    private fun calculateDirections(origMarker: Marker, destMarker: Marker) { // הפונקציה תקבל עוד מרקר ותשתמש בו למרקר מקור
+        Log.d(TAG, "calculateDirections: Started calculating directions.")
 
-        }
-    } // TODO*/
+        val dest = com.google.maps.model.LatLng(destMarker.position.latitude, destMarker.position.longitude)
+        Log.d(TAG, "calculateDirections: The destination is: $dest")
+
+        val directions = DirectionsApiRequest(mGeoApiContext)
+        directions.origin(com.google.maps.model.LatLng(origMarker.position.latitude, origMarker.position.longitude)) //required
+        directions.destination(com.google.maps.model.LatLng(destMarker.position.latitude, destMarker.position.longitude)) //required
+        directions.mode(TravelMode.DRIVING) //required
+        directions.alternatives(true) //showing all possible routes (optional)
+
+        //directions.optimizeWaypoints(true) // THIS IS WHAT I NEED - showing optimal route
+
+        //Log.d(TAG,"calculateDirections: Current locations is: $currentLatLong")
+
+        //callback needs to be called after the request id completed
+        //directions.destination(destination).setCallback(PendingResult.Callback<DirectionsResult?> {
+        //fun onResult(result: DirectionsResult, callback: PendingResult<DirectionsResult>) { //retrieving info
+
+        directions.setCallback(object : com.google.maps.PendingResult.Callback<DirectionsResult>{
+            override fun onResult(result: DirectionsResult) { //retrieving info
+                Log.d(TAG, "calculateDirections1: routes: " + result.routes[0].toString())
+                Log.d(TAG, "calculateDirections2: duration: " + result.routes[0].legs[0].duration)
+                Log.d(TAG, "calculateDirections3: distance: " + result.routes[0].legs[0].distance)
+                Log.d(TAG, "calculateDirections4: geocodedWayPoints: " + result.geocodedWaypoints[0].toString())
+
+                addPolylinesToMap(result)
+            }
+            override fun onFailure(e: Throwable) {
+                //Log.d(TAG,"calculateDirections: Current locations is: $currentLatLong")
+                Log.e(TAG, "calculateDirections: Failed to get directions: " + e.message)
+            }
+        })
+    }
 
     override fun onInfoWindowClick(p0: Marker) {
-        if (flag == 2){
-            //selectedLocations.add(readDataFromFirebase())
-        }
-        //TODO: Add attractions to selectedLocations Array upon clinking when build route is enabled
+        Log.d("test","testing info window")
+        val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
+        builder.setMessage(p0.getSnippet())
+            .setCancelable(true)
+            .setPositiveButton(getString(R.string.addToRoute),
+                DialogInterface.OnClickListener { dialog, id ->
+                    mSelectedMarker = p0
+                    markerList.add(p0)
+                    dialog.dismiss()
+
+                    Log.d(TAG, "MarkerList - Added to Array, Array size is ${markerList.size}")})
+            .setNegativeButton(getString(R.string.cancel),
+                DialogInterface.OnClickListener { dialog, id -> dialog.cancel() })
+        val alert: AlertDialog = builder.create()
+        alert.show()
+
+        p0.hideInfoWindow()
+
+        p0.position.latitude //TODO IMPORTANT
     }
 
     private fun getDistance(startLat: Double, startLon: Double, endLat: Double, endLon: Double): String {
@@ -473,8 +543,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         val distanceInKm : Float
         Location.distanceBetween(startLat, startLon, endLat, endLon, results)
 
-        if(results[0]>1000)
-        {
+        if(results[0]>1000) {
             distanceInKm = results[0] / 1000
             roundOff = ((distanceInKm * 100.0).roundToInt() / 100.0).toFloat()
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!))
@@ -482,8 +551,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
             else
                 "$roundOff kilometers"
         }
-        else
-        {
+        else {
             distanceInKm = results[0] / 1000
             roundOff = ((distanceInKm * 100.0).roundToInt() / 100.0).toFloat()
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!))
@@ -491,7 +559,6 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
             else
                 "$roundOff meters"
         }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -524,12 +591,88 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                 return true
             }
             R.id.build -> {
-                flag = 2
-                findNavController(binding.root).navigate(R.id.action_mainFragment_to_buildRoute)
+                //flag = 2
+                Log.d(TAG, "Build route is selected by user")
+                if(markerList.isEmpty() || markerList.size == 1){
+                    Log.d(TAG, "MarkerList is empty or not complete - user needs to add (more) locations")
+                    val alertDialog: AlertDialog.Builder = AlertDialog.Builder(activity)
+                    alertDialog.setMessage(getString(R.string.emptyMarkerList))
+                    val alert: AlertDialog = alertDialog.create()
+                    alert.show()
+                }
+                else{
+                    //for (i in markerList.indices){
+                    //mSelectedMarker = markerList[1]
+
+                    var index = markerList.size-2
+                    for (i in 0..index){
+                        calculateDirections(markerList[i],markerList[i+1])
+                    }
+
+
+
+                    //calculateDirections(markerList[0], markerList[1])
+                }
+                return true
+            }
+            R.id.clear -> {
+                if(markerList.isNotEmpty()){
+                    markerList.clear()
+                    for(element in markerList) {
+                        Log.d("MarkerList","$element")
+                    }
+                    //Log.d("MarkerList",markerList)
+                }
+                for(polylineData in mPolylinesData){
+                    polylineData.polyline.remove()
+                }
+                mSelectedMarker!!.isVisible = true
+                Log.d(TAG, "MarkerList is clear")
+                val alertDialog: AlertDialog.Builder = AlertDialog.Builder(activity)
+                alertDialog.setMessage(getString(R.string.clearRouteMessage))
+                val alert: AlertDialog = alertDialog.create()
+                alert.show()
                 return true
             }
 
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onPolylineClick(polyline: Polyline) {
+        //polyline.color = ContextCompat.getColor(activity!!, R.color.blue)
+        //polyline.zIndex = 1f
+
+        var tripNum = 0
+        for (polylineData in mPolylinesData) {
+            tripNum++
+            Log.d(TAG, "onPolylineClick: toString: $polylineData")
+            if (polyline.id.equals(polylineData.polyline.id)) {
+                polylineData.polyline.color = ContextCompat.getColor(activity!!, R.color.blue)
+                polylineData.polyline.zIndex = 1f
+
+                var endLocation = LatLng(polylineData.leg.endLocation.lat, polylineData.leg.endLocation.lng) //planting a new marker
+                val marker = mMap.addMarker(MarkerOptions()
+                    .position(endLocation)
+                    .title("Trip: #$tripNum")
+                    .snippet("Duration: " + polylineData.leg.duration)
+                )
+
+                if (marker != null) {
+                    marker.showInfoWindow()
+                }
+
+                /*mMap.addMarker(MarkerOptions()
+                        .position(endLocation)
+                        .title("Trip: #$tripNum")
+                        .snippet("Duration: " + polylineData.leg.duration)
+                )?.showInfoWindow()*/
+
+
+            } else {
+                polylineData.polyline.color = ContextCompat.getColor(activity!!, android.R.color.darker_gray)
+                polylineData.polyline.zIndex = 0f
+            }
         }
     }
 }
