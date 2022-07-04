@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.IntentSender.SendIntentException
 import android.content.pm.PackageManager
 import android.location.Location
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -61,7 +62,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     private var markerList:ArrayList<Marker> = ArrayList() //Array of selected locations
     private var mPolylinesData:ArrayList<PolylineData> = ArrayList()
     private var mSelectedMarker: Marker? = null
-    private var markerListString = ArrayList<String>() //TODO Array of selected string locations
+    private var markerListString = ArrayList<String>()
     private val LOCATION_PERMISSION_REQUEST_CODE = 1234
     private val TAG = "MapActivity"
     private val TAG_DB = "Database"
@@ -265,12 +266,6 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
             else
                 readDataFromFirebase(mMap)
         }
-        /*if(flag == 2){
-            Log.d(TAG,"I'm here")
-            markerList = retrieveMarkerList()
-            if(markerList.isNotEmpty())
-                readDataFromFirebaseByCategory(mMap, markerListString)
-        }*/
         else
             readDataFromFirebase(mMap)
         mMap.setOnInfoWindowClickListener(this)
@@ -397,7 +392,6 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     }
 
     // retrieve the specific categories the user chose from the fragment FilterAttraction
-    //TODO -> use this after clicking on "Build Route"
     private fun retrieveCategoryFilter() : ArrayList<String> {
         var retrieveCategoryArrayList = ArrayList<String>()
         if (flag == 1) { // in case the user did not pick any category filter (all checkboxes are empty)
@@ -423,7 +417,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
             return markerList
         }
         return markerList*/
-    } //TODO
+    }
 
     private fun readDataFromFirebase(googleMap: GoogleMap) {
         lateinit var  distance : String
@@ -478,7 +472,6 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         })
     }
 
-    //private fun calculateDirections(marker: Marker)
     private fun calculateDirections(origMarker: Marker, destMarker: Marker) { // הפונקציה תקבל עוד מרקר ותשתמש בו למרקר מקור
         Log.d(TAG, "calculateDirections: Started calculating directions.")
 
@@ -489,15 +482,7 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
         directions.origin(com.google.maps.model.LatLng(origMarker.position.latitude, origMarker.position.longitude)) //required
         directions.destination(com.google.maps.model.LatLng(destMarker.position.latitude, destMarker.position.longitude)) //required
         directions.mode(TravelMode.DRIVING) //required
-        directions.alternatives(true) //showing all possible routes (optional)
-
-        //directions.optimizeWaypoints(true) // THIS IS WHAT I NEED - showing optimal route
-
-        //Log.d(TAG,"calculateDirections: Current locations is: $currentLatLong")
-
-        //callback needs to be called after the request id completed
-        //directions.destination(destination).setCallback(PendingResult.Callback<DirectionsResult?> {
-        //fun onResult(result: DirectionsResult, callback: PendingResult<DirectionsResult>) { //retrieving info
+        directions.alternatives(true) //showing all possible routes
 
         directions.setCallback(object : com.google.maps.PendingResult.Callback<DirectionsResult>{
             override fun onResult(result: DirectionsResult) { //retrieving info
@@ -525,16 +510,49 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                     mSelectedMarker = p0
                     markerList.add(p0)
                     dialog.dismiss()
-
                     Log.d(TAG, "MarkerList - Added to Array, Array size is ${markerList.size}")})
+
+            .setNeutralButton(getString(R.string.goToURL),
+                DialogInterface.OnClickListener { dialog, id ->
+                    onInfoClick(p0)
+                    dialog.dismiss()})
+
             .setNegativeButton(getString(R.string.cancel),
                 DialogInterface.OnClickListener { dialog, id -> dialog.cancel() })
+
         val alert: AlertDialog = builder.create()
         alert.show()
 
         p0.hideInfoWindow()
 
-        p0.position.latitude //TODO IMPORTANT
+        //p0.position.latitude
+    }
+
+    fun onInfoClick(p0: Marker) {
+        var lat : Double
+        var lon: Double
+        val realTimeDatabase = FirebaseDatabase.getInstance().getReference("Attractions")
+        realTimeDatabase.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (dataSnap in dataSnapshot.children) {
+                    val description = dataSnap.child("description").value.toString()
+                    lat = dataSnap.child("latitude").value.toString().toDouble()
+                    lon = dataSnap.child("Longitude").value.toString().toDouble()
+
+                   // Log.w(TAG_DB, "onInfoWindowClick: In function, description = ${p0.title})" )
+
+                    if(p0.position.latitude == lat && p0.position.longitude == lon) {
+                        Log.w(TAG_DB, "onInfoWindowClick: In function, description = ${p0.title})" )
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(changeBlogUrlByLanguage(description)))
+                        startActivity(intent)
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Log.w(TAG_DB, "onInfoWindowClick: in onCancelled, Error = ${error})" )
+
+            }
+        })
     }
 
     private fun getDistance(startLat: Double, startLon: Double, endLat: Double, endLon: Double): String {
@@ -609,8 +627,6 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                         calculateDirections(markerList[i],markerList[i+1])
                     }
 
-
-
                     //calculateDirections(markerList[0], markerList[1])
                 }
                 return true
@@ -640,9 +656,6 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
     }
 
     override fun onPolylineClick(polyline: Polyline) {
-        //polyline.color = ContextCompat.getColor(activity!!, R.color.blue)
-        //polyline.zIndex = 1f
-
         var tripNum = 0
         for (polylineData in mPolylinesData) {
             tripNum++
@@ -662,17 +675,28 @@ class MainFragment : Fragment(),OnMapReadyCallback,GoogleMap.OnInfoWindowClickLi
                     marker.showInfoWindow()
                 }
 
-                /*mMap.addMarker(MarkerOptions()
-                        .position(endLocation)
-                        .title("Trip: #$tripNum")
-                        .snippet("Duration: " + polylineData.leg.duration)
-                )?.showInfoWindow()*/
-
-
             } else {
                 polylineData.polyline.color = ContextCompat.getColor(activity!!, android.R.color.darker_gray)
                 polylineData.polyline.zIndex = 0f
             }
+        }
+    }
+
+    private fun changeBlogUrlByLanguage(attrBlogUrl: String) : String {
+        val newBlogUrl:String
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && isRTL(activity!!)) { // התנאי הזה זה השינויים שצריך לעשות במידה והטלפון בעברית
+            return if(!attrBlogUrl.contains("/he/")) {
+                newBlogUrl = attrBlogUrl.replace(".com/", ".com/he/")
+                newBlogUrl
+            } else
+                attrBlogUrl
+        }
+        else {
+            return if (attrBlogUrl.contains("/he/")) {
+                newBlogUrl = attrBlogUrl.replace("/he/", "/")
+                newBlogUrl
+            } else
+                attrBlogUrl
         }
     }
 }
